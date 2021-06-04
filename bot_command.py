@@ -16,6 +16,7 @@ async def set_lang(client: discord.Client, message: discord.message.Message, new
         gtts.gTTS("hello", lang=new_lang)
     except ValueError as e:
         await message.channel.send(f"ERROR: {e}")
+        await message.channel.send(f"INFO: Current language: {lang}")
         return
     lang = new_lang
     await message.channel.send(f"WARNING: Language was set into {lang}")
@@ -40,6 +41,10 @@ async def say_text(client: discord.Client, message: discord.message.Message, tex
         await author_voice_channel.connect()
 
     bot_voice_client = discord.utils.get(client.voice_clients, guild=message.guild)
-    await tts_done
+    try:
+        await tts_done
+    except AssertionError as e:
+        await message.channel.send(f"ERROR: {e}")
+        return
     bot_voice_client.play(discord.FFmpegPCMAudio("tts.mp3"))
     # await message.channel.send(f"INFO: Text was send to voice channel {author_voice_channel}: {text}")

@@ -20,6 +20,9 @@ async def on_message(message: discord.message.Message):
         return
     for k in command.keys():
         if message.content.startswith(k):
+            if len(message.content) < 1 + len(k):
+                await message.channel.send("ERROR: Argument empty")
+                continue
             text = message.content[1 + len(k):]
             await command[k](client, message, text)
 
