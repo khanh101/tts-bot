@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 import discord
@@ -6,8 +7,29 @@ import gtts
 lang = "vi"
 
 
-async def tts(text: str, filename: str = "tts.mp3"):
+async def _tts(text: str, filename: str):
     gtts.gTTS(text=text, lang=lang).save(filename)
+
+
+async def _say_mp3file(client: discord.Client, message: discord.message.Message, filename: str):
+    # ensure author is in a voice channel
+    author_voice_state: Optional[discord.member.VoiceState] = message.author.voice
+    if author_voice_state is None:
+        await message.channel.send(f"ERROR: {message.author} is not current in any voice channel!")
+        return
+    # get author voice channel
+    author_voice_channel: discord.channel.VoiceChannel = author_voice_state.channel
+    # get bot voice channel
+    bot_voice_client: discord.voice_client.VoiceClient = discord.utils.get(client.voice_clients, guild=message.guild)
+    if bot_voice_client is None:
+        await author_voice_channel.connect()
+    elif bot_voice_client.channel != author_voice_channel:
+        await bot_voice_client.disconnect()
+        await author_voice_channel.connect()
+
+    bot_voice_client = discord.utils.get(client.voice_clients, guild=message.guild)
+    bot_voice_client.stop()
+    bot_voice_client.play(discord.FFmpegPCMAudio(source=filename))
 
 
 async def set_lang(client: discord.Client, message: discord.message.Message, new_lang: str):
@@ -23,29 +45,13 @@ async def set_lang(client: discord.Client, message: discord.message.Message, new
 
 
 async def say_text(client: discord.Client, message: discord.message.Message, text: str):
-    # ensure author is in a voice channel
-    author_voice_state: Optional[discord.member.VoiceState] = message.author.voice
-    if author_voice_state is None:
-        await message.channel.send("ERROR: Author is not current in any voice channel!")
-        return
-    # async: tts
-    tts_done = tts(text=text)
-    # get author voice channel
-    author_voice_channel: discord.channel.VoiceChannel = author_voice_state.channel
-    # get bot voice channel
-    bot_voice_client: discord.voice_client.VoiceClient = discord.utils.get(client.voice_clients, guild=message.guild)
-    if bot_voice_client is None:
-        await author_voice_channel.connect()
-    elif bot_voice_client.channel != author_voice_channel:
-        await bot_voice_client.disconnect()
-        await author_voice_channel.connect()
+    await _tts(text=text, filename=".tts.mp3")
+    await _say_mp3file(client, message, ".tts.mp3")
 
-    bot_voice_client = discord.utils.get(client.voice_clients, guild=message.guild)
-    try:
-        await tts_done
-    except AssertionError as e:
-        await message.channel.send(f"ERROR: {e}")
+
+async def say_special(client: discord.Client, message: discord.message.Message, name: str):
+    filename = f"{name}.mp3"
+    if not os.path.exists(filename):
+        await message.channel.send(f"ERROR: Special not found: {name}")
         return
-    bot_voice_client.stop()
-    bot_voice_client.play(discord.FFmpegPCMAudio("tts.mp3"))
-    # await message.channel.send(f"INFO: Text was send to voice channel {author_voice_channel}: {text}")
+    await _say_mp3file(client, message, filename)
