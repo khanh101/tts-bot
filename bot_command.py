@@ -4,13 +4,14 @@ from typing import Optional
 import discord
 import gtts
 
-lang = "vi"
-tts_filename = "tts.mp3"
-SPECIAL_PATH = "special"
+LANG = "vi"
+TTS_FILENAME = "tts.mp3"
+SPECIAL_FOLDER = "special"
+TTS_CHANNEL = "tts-bot"
 
 
 async def _tts(text: str, filename: str):
-    gtts.gTTS(text=text, lang=lang).save(filename)
+    gtts.gTTS(text=text, lang=LANG).save(filename)
 
 
 async def _say_mp3file(client: discord.Client, message: discord.message.Message, filename: str):
@@ -35,24 +36,34 @@ async def _say_mp3file(client: discord.Client, message: discord.message.Message,
 
 
 async def set_lang(client: discord.Client, message: discord.message.Message, new_lang: str):
-    global lang
+    global LANG
     try:
         gtts.gTTS("hello", lang=new_lang)
     except ValueError as e:
         await message.channel.send(f"ERROR: {e}")
-        await message.channel.send(f"INFO: Current language: {lang}")
+        await message.channel.send(f"INFO: Current language: {LANG}")
         return
-    lang = new_lang
-    await message.channel.send(f"WARNING: Language was set into {lang}")
+    LANG = new_lang
+    await message.channel.send(f"WARNING: Language was set into {LANG}")
+
+
+async def set_tts_channel(client: discord.Client, message: discord.message.Message, new_text_channel: str):
+    global TTS_CHANNEL
+    TTS_CHANNEL = new_text_channel
+    await message.channel.send(f"INFO: Text channel was set into {TTS_CHANNEL}")
+
+def get_tts_channel() -> str:
+    global TTS_CHANNEL
+    return TTS_CHANNEL
 
 
 async def say_text(client: discord.Client, message: discord.message.Message, text: str):
-    await _tts(text=text, filename=tts_filename)
-    await _say_mp3file(client, message, tts_filename)
+    await _tts(text=text, filename=TTS_FILENAME)
+    await _say_mp3file(client, message, TTS_FILENAME)
 
 
 async def say_special(client: discord.Client, message: discord.message.Message, name: str):
-    filename = os.path.join(SPECIAL_PATH, name) + ".mp3"
+    filename = os.path.join(SPECIAL_FOLDER, name) + ".mp3"
     if not os.path.exists(filename):
         await message.channel.send(f"ERROR: Special not found: {name}")
         return
@@ -64,8 +75,10 @@ async def howto(client: discord.Client, message: discord.message.Message):
     help_message += "\t !say <text> : say text\n"
     help_message += "\t !lang <lang> : change language\n"
     help_message += "\t !special <special> : say special\n"
+    help_message += f"\t <text>: say text if text in tts channel: {TTS_CHANNEL}\n"
+    help_message += "\t !tts_channel <channel>: set tts channel\n"
     help_message += "SPECIAL LIST:\n"
-    for filename in os.listdir(SPECIAL_PATH):
+    for filename in os.listdir(SPECIAL_FOLDER):
         help_message += f"\t{'.'.join(filename.split('.')[:-1])}"
 
     await message.channel.send(help_message)
