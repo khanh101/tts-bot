@@ -52,6 +52,7 @@ async def set_tts_channel(client: discord.Client, message: discord.message.Messa
     TTS_CHANNEL = new_text_channel
     await message.channel.send(f"INFO: Text channel was set into {TTS_CHANNEL}")
 
+
 def get_tts_channel() -> str:
     global TTS_CHANNEL
     return TTS_CHANNEL
@@ -77,6 +78,9 @@ async def howto(client: discord.Client, message: discord.message.Message):
     help_message += "\t !special <special> : say special\n"
     help_message += f"\t <text>: say text if text in tts channel: {TTS_CHANNEL}\n"
     help_message += "\t !tts_channel <channel>: set tts channel\n"
+    help_message += "CURRENT SETTINGS:\n"
+    help_message += f"\t lang: {LANG}\n"
+    help_message += f"\t tts channel: {TTS_CHANNEL}\n"
     help_message += "SPECIAL LIST:\n"
     for filename in os.listdir(SPECIAL_FOLDER):
         help_message += f"\t{'.'.join(filename.split('.')[:-1])}"
