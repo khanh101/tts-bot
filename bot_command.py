@@ -73,6 +73,7 @@ async def say_special(client: discord.Client, message: discord.message.Message, 
 
 async def howto(client: discord.Client, message: discord.message.Message):
     help_message = "HOW TO:\n"
+    help_message += "\t !howto : help\n"
     help_message += "\t !say <text> : say text\n"
     help_message += "\t !lang <lang> : change language\n"
     help_message += "\t !special <special> : say special\n"
