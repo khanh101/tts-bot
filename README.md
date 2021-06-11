@@ -5,14 +5,13 @@ discord bot
 ## how to use
 
 ```
-HOW TO:
-     !howto : help
-     !say <text> : say text
-     !lang <lang> : change language
-     !special <special> : say special
-     <text>: say text if text in tts channel: tts-bot
-     !tts_channel <channel>: set tts channel
-CURRENT SETTINGS:
-     lang: vi
-     tts channel: tts-bot
+HELP:
+    !howto: how to use
+    !say <text>: say text
+    !set_lang <lang>: set language
+    !special <special>: say special
+SETTINGS: 411063099185954817
+    lang:vi
+SPECIAL LIST:
+    no    airhorn    easiest    play2win    70tuoi    anhemconcac    devailon    ditmecuocdoi    cacbantuoigi    nextlevel    andaubuoi    nigga    wtfisthat    cosung    wegothim    illuminati    cuong    danhchetcha    nghia
 ```
