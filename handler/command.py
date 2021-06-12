@@ -7,7 +7,7 @@ import gtts
 from handler.config import Config
 
 # constant
-SPECIAL_FOLDER = "special"
+SPECIAL_FOLDER = "line"
 TTS_CHANNEL = "tts-bot"
 
 

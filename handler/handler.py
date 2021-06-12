@@ -18,7 +18,7 @@ command_with_args: Dict[
 ] = {
     "!say": (say_text, "!say <text>: say text"),
     "!set_lang": (set_lang, "!set_lang <lang>: set language"),
-    "!special": (say_special, "!special <special>: say special"),
+    "!line": (say_special, "!line <line>: say line"),
 }
 
 config: Dict[int, Config] = {}
