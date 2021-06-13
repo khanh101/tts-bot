@@ -3,6 +3,7 @@ from typing import Dict, Callable, Any, Coroutine, Tuple
 
 import discord
 
+from handler.block import get_blocked_user
 from handler.command import say_text, set_lang, say_line, TTS_CHANNEL, LINE_FOLDER
 from handler.config import Config
 
@@ -49,6 +50,9 @@ async def handle_message(client: discord.Client, message: discord.Message):
         return
     # filter out bot message
     if message.author.bot:
+        return
+    # filter out blocked user
+    if message.author in get_blocked_user():
         return
 
     server_id = int(message.guild.id)
