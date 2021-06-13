@@ -7,7 +7,7 @@ import gtts
 from handler.config import Config
 
 # constant
-SPECIAL_FOLDER = "line"
+LINE_FOLDER = "line"
 TTS_CHANNEL = "tts-bot"
 
 
@@ -57,9 +57,9 @@ async def say_text(config: Config, client: discord.Client, message: discord.mess
     await _say_mp3file(config, client, message, config.tts_tempfile)
 
 
-async def say_special(config: Config, client: discord.Client, message: discord.message.Message, name: str):
-    filename = os.path.join(SPECIAL_FOLDER, name) + ".mp3"
+async def say_line(config: Config, client: discord.Client, message: discord.message.Message, name: str):
+    filename = os.path.join(LINE_FOLDER, name) + ".mp3"
     if not os.path.exists(filename):
-        await message.channel.send(f"ERROR: Special not found: {name}")
+        await message.channel.send(f"ERROR: Line not found: {name}")
         return
     await _say_mp3file(config, client, message, filename)

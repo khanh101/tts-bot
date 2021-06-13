@@ -3,7 +3,7 @@ from typing import Dict, Callable, Any, Coroutine, Tuple
 
 import discord
 
-from handler.command import say_text, set_lang, say_special, TTS_CHANNEL, SPECIAL_FOLDER
+from handler.command import say_text, set_lang, say_line, TTS_CHANNEL, LINE_FOLDER
 from handler.config import Config
 
 command: Dict[
@@ -18,7 +18,7 @@ command_with_args: Dict[
 ] = {
     "!say": (say_text, "!say <text>: say text"),
     "!set_lang": (set_lang, "!set_lang <lang>: set language"),
-    "!line": (say_special, "!line <line>: say line"),
+    "!line": (say_line, "!line <line>: say line"),
 }
 
 config: Dict[int, Config] = {}
@@ -34,7 +34,7 @@ async def help_command(config: Config, client: discord.Client, message: discord.
     for k, v in config.__dict__().items():
         help_message += f"\t{k}:{v}\n"
     help_message += "SPECIAL LIST:\n"
-    for filename in os.listdir(SPECIAL_FOLDER):
+    for filename in os.listdir(LINE_FOLDER):
         help_message += f"\t{'.'.join(filename.split('.')[:-1])}"
 
     await message.channel.send(help_message)
