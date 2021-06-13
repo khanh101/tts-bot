@@ -64,8 +64,7 @@ async def handle_message(client: discord.Client, message: discord.Message):
             # filter out blocked user
             if is_banned(message.author):
                 await message.delete()
-                await message.channel.send(
-                    f"WARNING: User {message.author.name}#{message.author.discriminator} has been banned")
+                await message.channel.send(f"WARNING: {message.author.name}#{message.author.discriminator} has been banned")
                 return
 
             await command[k](config_dict[server_id], client, message)
@@ -77,8 +76,7 @@ async def handle_message(client: discord.Client, message: discord.Message):
             # filter out blocked user
             if is_banned(message.author):
                 await message.delete()
-                await message.channel.send(
-                    f"WARNING: User {message.author.name}#{message.author.discriminator} has been banned")
+                await message.channel.send(f"WARNING: {message.author.name}#{message.author.discriminator} has been banned")
                 return
 
             if len(message.content) < 1 + len(k):
@@ -93,8 +91,7 @@ async def handle_message(client: discord.Client, message: discord.Message):
         # filter out blocked user
         if is_banned(message.author):
             await message.delete()
-            await message.channel.send(
-                f"WARNING: User {message.author.name}#{message.author.discriminator} has been banned")
+            await message.channel.send(f"WARNING: {message.author.name}#{message.author.discriminator} has been banned")
             return
 
         await say_text(config_dict[server_id], client, message, text=message.content)
