@@ -51,11 +51,6 @@ async def handle_message(client: discord.Client, message: discord.Message):
     # filter out bot message
     if message.author.bot:
         return
-    # filter out blocked user
-    if message.author.discriminator in get_blocked_user():
-        await message.channel.send(f"WARNING: User {message.author.name}#{message.author.discriminator} has been blocked from using the bot")
-        return
-
     server_id = int(message.guild.id)
 
     if server_id not in config:
@@ -64,12 +59,24 @@ async def handle_message(client: discord.Client, message: discord.Message):
     # command
     for k in command.keys():
         if message.content == k:
+            # filter out blocked user
+            if message.author.discriminator in get_blocked_user():
+                await message.channel.send(
+                    f"WARNING: User {message.author.name}#{message.author.discriminator} has been blocked from using the bot")
+                return
+
             await command[k][0](config[server_id], client, message)
             return
 
     # command with args
     for k in command_with_args.keys():
         if message.content.startswith(k + " "):
+            # filter out blocked user
+            if message.author.discriminator in get_blocked_user():
+                await message.channel.send(
+                    f"WARNING: User {message.author.name}#{message.author.discriminator} has been blocked from using the bot")
+                return
+
             if len(message.content) < 1 + len(k):
                 await message.channel.send("ERROR: Argument empty")
                 continue
@@ -79,5 +86,11 @@ async def handle_message(client: discord.Client, message: discord.Message):
 
     # tts channel
     if message.channel.name == TTS_CHANNEL:
+        # filter out blocked user
+        if message.author.discriminator in get_blocked_user():
+            await message.channel.send(
+                f"WARNING: User {message.author.name}#{message.author.discriminator} has been blocked from using the bot")
+            return
+
         await say_text(config[server_id], client, message, text=message.content)
         return
