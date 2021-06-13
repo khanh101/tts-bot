@@ -11,7 +11,7 @@ from handler.config import Config
 # constant
 LINE_FOLDERNAME = "line"
 TTS_CHANNEL = "tts-bot"
-TIMEOUT = 30
+TIMEOUT = 300  # 5 minutes
 
 
 async def _tts(text: str, filename: str, lang: str):
