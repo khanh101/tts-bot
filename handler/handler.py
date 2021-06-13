@@ -61,6 +61,7 @@ async def handle_message(client: discord.Client, message: discord.Message):
         if message.content == k:
             # filter out blocked user
             if message.author.discriminator in get_blocked_user():
+                await message.delete()
                 await message.channel.send(
                     f"WARNING: User {message.author.name}#{message.author.discriminator} has been blocked from using the bot")
                 return
@@ -73,6 +74,7 @@ async def handle_message(client: discord.Client, message: discord.Message):
         if message.content.startswith(k + " "):
             # filter out blocked user
             if message.author.discriminator in get_blocked_user():
+                await message.delete()
                 await message.channel.send(
                     f"WARNING: User {message.author.name}#{message.author.discriminator} has been blocked from using the bot")
                 return
@@ -88,6 +90,7 @@ async def handle_message(client: discord.Client, message: discord.Message):
     if message.channel.name == TTS_CHANNEL:
         # filter out blocked user
         if message.author.discriminator in get_blocked_user():
+            await message.delete()
             await message.channel.send(
                 f"WARNING: User {message.author.name}#{message.author.discriminator} has been blocked from using the bot")
             return
