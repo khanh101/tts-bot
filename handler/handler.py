@@ -26,9 +26,9 @@ async def howto(config: Config, client: discord.Client, message: discord.message
         help_message += f"\t{f.__doc__}\n"
     for f in command_with_args.values():
         help_message += f"\t{f.__doc__}\n"
-    help_message += f"SETTINGS: {config.server_id}\n"
+    help_message += f"CONFIG: server_id {config.server_id}\n"
     for k, v in config.__dict__().items():
-        help_message += f"\t{k}:{v}\n"
+        help_message += f"\t{k}: {v}\n"
     help_message += "LINE AVAILABLE:\n"
     for filename in os.listdir(LINE_FOLDERNAME):
         help_message += f"\t{'.'.join(filename.split('.')[:-1])}"
