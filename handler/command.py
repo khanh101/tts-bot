@@ -37,6 +37,7 @@ async def _say_mp3file(config: Config, client: discord.Client, message: discord.
 
 
 async def set_lang(config: Config, client: discord.Client, message: discord.message.Message, lang: str):
+    """!lang <lang>: set language"""
     try:
         gtts.gTTS("hello", lang=lang)
     except ValueError as e:
@@ -48,11 +49,13 @@ async def set_lang(config: Config, client: discord.Client, message: discord.mess
 
 
 async def say_text(config: Config, client: discord.Client, message: discord.message.Message, text: str):
+    """!say <text>: say text"""
     await _tts(text=text, filename=config.tts_filename, lang=config.lang)
     await _say_mp3file(config, client, message, config.tts_filename)
 
 
 async def say_line(config: Config, client: discord.Client, message: discord.message.Message, name: str):
+    """!line <code>: say line"""
     await message.delete()
     filename = os.path.join(LINE_FOLDERNAME, name) + ".mp3"
     if not os.path.exists(filename):
