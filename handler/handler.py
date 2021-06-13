@@ -4,7 +4,7 @@ from typing import Dict, Callable, Any, Coroutine, Tuple
 import discord
 
 from handler.block import get_blocked_user
-from handler.command import say_text, set_lang, say_line, TTS_CHANNEL, LINE_FOLDER
+from handler.command import say_text, set_lang, say_line, TTS_CHANNEL, LINE_FOLDERNAME
 from handler.config import Config
 
 command: Dict[
@@ -35,7 +35,7 @@ async def help_command(config: Config, client: discord.Client, message: discord.
     for k, v in config.__dict__().items():
         help_message += f"\t{k}:{v}\n"
     help_message += "SPECIAL LIST:\n"
-    for filename in os.listdir(LINE_FOLDER):
+    for filename in os.listdir(LINE_FOLDERNAME):
         help_message += f"\t{'.'.join(filename.split('.')[:-1])}"
 
     await message.channel.send(help_message)

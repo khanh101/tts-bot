@@ -7,7 +7,7 @@ import gtts
 from handler.config import Config
 
 # constant
-LINE_FOLDER = "line"
+LINE_FOLDERNAME = "line"
 TTS_CHANNEL = "tts-bot"
 
 
@@ -47,18 +47,13 @@ async def set_lang(config: Config, client: discord.Client, message: discord.mess
     await message.channel.send(f"WARNING: Language was set into {config.lang}")
 
 
-async def set_tts_channel(config: Config, client: discord.Client, message: discord.message.Message, tts_channel: str):
-    config.tts_channel = tts_channel
-    await message.channel.send(f"INFO: Text channel was set into {config.tts_channel}")
-
-
 async def say_text(config: Config, client: discord.Client, message: discord.message.Message, text: str):
-    await _tts(text=text, filename=config.tts_tempfile, lang=config.lang)
-    await _say_mp3file(config, client, message, config.tts_tempfile)
+    await _tts(text=text, filename=config.tts_filename, lang=config.lang)
+    await _say_mp3file(config, client, message, config.tts_filename)
 
 
 async def say_line(config: Config, client: discord.Client, message: discord.message.Message, name: str):
-    filename = os.path.join(LINE_FOLDER, name) + ".mp3"
+    filename = os.path.join(LINE_FOLDERNAME, name) + ".mp3"
     if not os.path.exists(filename):
         await message.channel.send(f"ERROR: Line not found: {name}")
         return
