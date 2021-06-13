@@ -1,4 +1,6 @@
+import asyncio
 import os
+import time
 from typing import Optional
 
 import discord
@@ -9,10 +11,14 @@ from handler.config import Config
 # constant
 LINE_FOLDERNAME = "line"
 TTS_CHANNEL = "tts-bot"
+TIMEOUT = 30
 
 
 async def _tts(text: str, filename: str, lang: str):
     gtts.gTTS(text=text, lang=lang).save(filename)
+
+
+last_access = {}
 
 
 async def _say_mp3file(config: Config, client: discord.Client, message: discord.message.Message, filename: str):
@@ -34,6 +40,15 @@ async def _say_mp3file(config: Config, client: discord.Client, message: discord.
     bot_voice_client = discord.utils.get(client.voice_clients, guild=message.guild)
     bot_voice_client.stop()
     bot_voice_client.play(discord.FFmpegPCMAudio(source=filename))
+
+    # last access
+    server_id = int(message.guild.id)
+    last_access[server_id] = int(time.time()), bot_voice_client
+    await asyncio.sleep(TIMEOUT)
+    # auto disconnect
+    if server_id in last_access and int(time.time()) - last_access[server_id][0] >= TIMEOUT / 2:
+        await last_access[server_id][1].disconnect()
+        del last_access[server_id]
 
 
 async def set_lang(config: Config, client: discord.Client, message: discord.message.Message, lang: str):
