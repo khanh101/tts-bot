@@ -52,7 +52,8 @@ async def handle_message(client: discord.Client, message: discord.Message):
     if message.author.bot:
         return
     # filter out blocked user
-    if message.author in get_blocked_user():
+    if message.author.discriminator in get_blocked_user():
+        message.channel.send(f"WARNING: User {message.author.name}#{message.author.discriminator} has been blocked from using the bot")
         return
 
     server_id = int(message.guild.id)
