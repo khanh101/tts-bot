@@ -56,7 +56,6 @@ async def say_text(config: Config, client: discord.Client, message: discord.mess
 
 async def say_line(config: Config, client: discord.Client, message: discord.message.Message, name: str):
     """!line <code>: say line"""
-    await message.delete()
     filename = os.path.join(LINE_FOLDERNAME, name) + ".mp3"
     if not os.path.exists(filename):
         await message.channel.send(f"ERROR: Line not found: {name}")
