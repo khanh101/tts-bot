@@ -59,7 +59,7 @@ class Bot:
         self.server_id: str = server_id
         self.config: Config = Config(server_id)
         self.last_access: Optional[int] = None
-        self.gonna_disconnect: bool = False
+        self.voice_connected: bool = False
         self.command = {
             "!howto": self.howto,
         }
@@ -190,11 +190,10 @@ class Bot:
 
         # last access
         self.last_access = int(time.time())
-        if self.gonna_disconnect:
-            return
-        self.gonna_disconnect = True
+        self.voice_connected = True
         await asyncio.sleep(self.config["voice_timeout"])
         if int(time.time()) - self.last_access >= self.config["voice_timeout"] / 2:
-            self.gonna_disconnect = False
-            await bot_voice_client.disconnect()
-            await self.__log(message, "WARNING: Voice has been disconnected due to inactivity")
+            if self.voice_connected:
+                self.voice_connected = False
+                await bot_voice_client.disconnect()
+                await self.__log(message, "WARNING: Voice has been disconnected due to inactivity")
