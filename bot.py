@@ -11,6 +11,8 @@ import gtts
 class Config:
     def __init__(self, server_id: str):
         self.server_id: str = server_id
+
+    def __ensure(self):
         if not os.path.exists("cfg"):
             os.mkdir("cfg")
         if not os.path.exists("tts"):
@@ -48,6 +50,7 @@ class Config:
             json.dump(config, f, indent=4)
 
     def __read(self) -> Dict[str, Any]:
+        self.__ensure()
         with open(self.__get_config_path(), "r") as f:
             return json.load(f)
 
