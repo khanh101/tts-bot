@@ -23,7 +23,7 @@ class Config:
             self.__write({
                 "lang": "vi",
                 "tts_path": os.path.join("tts", f"tts_{self.server_id}.mp3"),
-                "voice_timeout": 300,
+                "voice_timeout": 3600,
                 "log_timeout": 30,
                 "ban_list": [],
                 "line_dir": "line",
