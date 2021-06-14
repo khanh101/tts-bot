@@ -19,13 +19,13 @@ class Config:
             os.mkdir("line")
         if not os.path.exists(self.__get_config_path()):
             self.__write({
+                "tts_channel": "tts-bot",
                 "lang": "vi",
-                "tts_path": f"tts_{self.server_id}.mp3",
                 "voice_timeout": 3600,
                 "log_timeout": 30,
                 "ban_list": [],
+                "tts_path": f"tts_{self.server_id}.mp3",
                 "line_dir": "line",
-                "tts_channel": "tts-bot"
             })
 
     def __getitem__(self, key: str) -> Any:
@@ -38,7 +38,14 @@ class Config:
         self.__write(config)
 
     def __dict__(self) -> Dict[str, Any]:
-        return self.__read()
+        config = self.__read()
+        return {
+            "tts_channel": config["tts_channel"],
+            "lang": config["lang"],
+            "voice_timeout": config["voice_timeout"],
+            "log_timeout": config["log_timeout"],
+            "ban_list": config["ban_list"],
+        }
 
     def __get_config_path(self) -> str:
         return os.path.join("cfg", f"cfg_{self.server_id}.json")
