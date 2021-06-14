@@ -21,7 +21,8 @@ class Config:
             self.__write({
                 "lang": "vi",
                 "tts_path": os.path.join("tts", f"tts_{self.server_id}.mp3"),
-                "timeout": 300,
+                "voice_timeout": 300,
+                "log_timeout": 30,
                 "ban_list": [],
                 "line_dir": "line",
                 "tts_channel": "tts-bot"
@@ -67,6 +68,7 @@ class Bot:
             "!line": self.say_line,
         }
 
+
     async def handle(self, message: discord.Message):
         author: discord.member.Member = message.author
         # filter out self message
@@ -82,8 +84,10 @@ class Bot:
             if message.content == k:
                 if message.author.discriminator in self.config["ban_list"]:
                     await message.delete()
-                    await message.channel.send(
-                        f"WARNING: {message.author.name}#{message.author.discriminator} has been banned")
+                    await self.__log(
+                        message,
+                        f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
+                    )
                     return
 
                 await f(message)
@@ -93,11 +97,13 @@ class Bot:
             if message.content.startswith(k + " "):
                 if message.author.discriminator in self.config["ban_list"]:
                     await message.delete()
-                    await message.channel.send(
-                        f"WARNING: {message.author.name}#{message.author.discriminator} has been banned")
+                    await self.__log(
+                        message,
+                        f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
+                    )
                     return
                 if len(message.content) < 1 + len(k):
-                    await message.channel.send(f"ERROR: Argument empty")
+                    await self.__log(message, f"ERROR: Argument empty")
                     return
                 text = message.content[1 + len(k):]
                 await f(message, text)
@@ -107,8 +113,10 @@ class Bot:
         if message.channel.name == self.config["tts_channel"]:
             if message.author.discriminator in self.config["ban_list"]:
                 await message.delete()
-                await message.channel.send(
-                    f"WARNING: {message.author.name}#{message.author.discriminator} has been banned")
+                await self.__log(
+                    message,
+                    f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
+                )
                 return
             await self.say_text(message, message.content)
             return
@@ -122,7 +130,7 @@ class Bot:
         """!line <line>: say line"""
         line_path = os.path.join(self.config["line_dir"], line) + ".mp3"
         if not os.path.exists(line_path):
-            await message.channel.send(f"ERROR: Line not found: {line}")
+            await self.__log(message, f"ERROR: Line not found: {line}")
             return
         await self.__say_mp3file(message, line_path)
 
@@ -131,27 +139,32 @@ class Bot:
         try:
             gtts.gTTS("hello", lang=lang)
         except ValueError as e:
-            await message.channel.send(f"ERROR: {e}")
-            await message.channel.send(f"INFO: Current language: {self.config['lang']}")
+            await self.__log(message, f"ERROR: {e}")
+            await self.__log(message, "INFO: Current language: {self.config['lang']}")
             return
         self.config["lang"] = lang
-        await message.channel.send(f"WARNING: Language was set into {lang}")
+        await self.__log(message, f"WARNING: Language was set into {lang}")
 
     async def howto(self, message: discord.Message):
         """!howto: help"""
-        help_message = "HELP:\n"
+        help_message = "HELP: https://github.com/khanhcsc/tts-bot\n"
         for f in self.command.values():
             help_message += f"\t{f.__doc__}\n"
         for f in self.command_with_args.values():
             help_message += f"\t{f.__doc__}\n"
-        help_message += f"CONFIG: server_id {self.server_id}\n"
+        help_message += f"CONFIG:\n"
         for k, v in self.config.__dict__().items():
             help_message += f"\t{k}: {v}\n"
         help_message += "LINE AVAILABLE:\n"
         for filename in os.listdir(self.config["line_dir"]):
             help_message += f"\t{'.'.join(filename.split('.')[:-1])}"
 
-        await message.channel.send(help_message)
+        await self.__log(message, help_message)
+
+    async def __log(self, message: discord.Message, text: str):
+        m = await message.channel.send(text)
+        await asyncio.sleep(self.config["log_timeout"])
+        await m.delete()
 
     async def __tts(self, text: str):
         gtts.gTTS(text=text, lang=self.config["lang"]).save(self.config["tts_path"])
@@ -160,7 +173,7 @@ class Bot:
         # ensure author is in a voice channel
         author_voice_state: Optional[discord.VoiceState] = message.author.voice
         if author_voice_state is None:
-            await message.channel.send(f"ERROR: {message.author} is not in any voice channel")
+            await self.__log(message, f"ERROR: {message.author} is not in any voice channel")
             return
         # ensure bot and author in the same voice channel
         author_voice_channel: discord.VoiceChannel = author_voice_state.channel
@@ -180,7 +193,8 @@ class Bot:
         if self.gonna_disconnect:
             return
         self.gonna_disconnect = True
-        await asyncio.sleep(self.config["timeout"])
-        if int(time.time()) - self.last_access >= self.config["timeout"] / 2:
+        await asyncio.sleep(self.config["voice_timeout"])
+        if int(time.time()) - self.last_access >= self.config["voice_timeout"] / 2:
             self.gonna_disconnect = False
             await bot_voice_client.disconnect()
+            await self.__log(message, "WARNING: Voice has been disconnected due to inactivity")
