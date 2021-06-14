@@ -15,14 +15,12 @@ class Config:
     def __ensure(self):
         if not os.path.exists("cfg"):
             os.mkdir("cfg")
-        if not os.path.exists("tts"):
-            os.mkdir("tts")
         if not os.path.exists("line"):
             os.mkdir("line")
         if not os.path.exists(self.__get_config_path()):
             self.__write({
                 "lang": "vi",
-                "tts_path": os.path.join("tts", f"tts_{self.server_id}.mp3"),
+                "tts_path": f"tts_{self.server_id}.mp3",
                 "voice_timeout": 3600,
                 "log_timeout": 30,
                 "ban_list": [],
@@ -70,7 +68,6 @@ class Bot:
             "!lang": self.set_lang,
             "!line": self.say_line,
         }
-
 
     async def handle(self, message: discord.Message):
         author: discord.member.Member = message.author
