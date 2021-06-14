@@ -150,7 +150,7 @@ class Bot:
 
     async def howto(self, message: discord.Message):
         """!howto: help"""
-        help_message = "HELP: https://github.com/khanhcsc/tts-bot\n"
+        help_message = "HELP:\n"
         for f in self.command.values():
             help_message += f"\t{f.__doc__}\n"
         for f in self.command_with_args.values():
