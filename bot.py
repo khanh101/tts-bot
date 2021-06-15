@@ -6,6 +6,7 @@ from typing import Dict, Any, Optional
 
 import discord
 import gtts
+import nltk
 
 
 class Config:
@@ -128,25 +129,30 @@ class Bot:
             await self.say_text(message, message.content)
             return
 
-    def __mention_to_name(self, text: str) -> str:
-        words = text.split(" ")
-        for i, w in enumerate(words):
-            if w.startswith("<@!") and w.endswith(">"):
-                return "men sần cái lồn, bố mày đéo đọc được"
-        return text
-
     async def say_text(self, message: discord.Message, text: str):
         """!say <text>: say text or <text>: say text in tts channel"""
-        text = self.__mention_to_name(text)
+        for i, w in enumerate(text.split(" ")):
+            if w.startswith("<@!") and w.endswith(">"):
+                text = "men sần cái lồn, bố mày đéo đọc được"
+                break
         await self.__tts(text)
         await self.__say_mp3file(message, self.config["tts_path"])
 
     async def say_line(self, message: discord.Message, line: str):
         """!line <line>: say line"""
-        line_path = os.path.join(self.config["line_dir"], line) + ".mp3"
-        if not os.path.exists(line_path):
-            await self.__log(message, f"ERROR: Line not found: {line}")
-            return
+        line_list = []
+        for filename in os.listdir(self.config["line_dir"]):
+            line_list.append('.'.join(filename.split('.')[:-1]))
+
+        best_line = line_list[0]
+        best_dist = nltk.edit_distance(best_line, line)
+        for i in range(1, len(line_list)):
+            dist = nltk.edit_distance(line_list[i], line)
+            if dist < best_dist:
+                best_dist = dist
+                best_line = line_list[i]
+
+        line_path = os.path.join(self.config["line_dir"], best_line) + ".mp3"
         await self.__say_mp3file(message, line_path)
 
     async def set_lang(self, message: discord.Message, lang: str):
