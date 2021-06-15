@@ -145,9 +145,9 @@ class Bot:
             line_list.append('.'.join(filename.split('.')[:-1]))
 
         best_line = line_list[0]
-        best_dist = nltk.edit_distance(best_line, line)
+        best_dist = nltk.edit_distance(best_line, line) / len(best_line)
         for i in range(1, len(line_list)):
-            dist = nltk.edit_distance(line_list[i], line)
+            dist = nltk.edit_distance(line_list[i], line) / len(line_list[i])
             if dist < best_dist:
                 best_dist = dist
                 best_line = line_list[i]
