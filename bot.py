@@ -128,8 +128,16 @@ class Bot:
             await self.say_text(message, message.content)
             return
 
+    def __mention_to_name(self, text: str) -> str:
+        words = text.split(" ")
+        for i, w in enumerate(words):
+            if w.startswith("<@!") and w.endswith(">"):
+                return "men sần cái lồn, bố mày đéo đọc được"
+        return text
+
     async def say_text(self, message: discord.Message, text: str):
         """!say <text>: say text or <text>: say text in tts channel"""
+        text = self.__mention_to_name(text)
         await self.__tts(text)
         await self.__say_mp3file(message, self.config["tts_path"])
 
