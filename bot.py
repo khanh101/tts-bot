@@ -2,7 +2,7 @@ import asyncio
 import json
 import os
 import time
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 import discord
 import gtts
@@ -96,9 +96,9 @@ class Bot:
                         message,
                         f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
                     )
-                    return
-
-                await f(message)
+                else:
+                    await f(message)
+                await self.__timeout_delete(message)
                 return
         # command with args
         for k, f in self.command_with_args.items():
@@ -109,12 +109,13 @@ class Bot:
                         message,
                         f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
                     )
-                    return
-                if len(message.content) < 1 + len(k):
-                    await self.__log(message, f"ERROR: Argument empty")
-                    return
-                text = message.content[1 + len(k):]
-                await f(message, text)
+                else:
+                    if len(message.content) < 1 + len(k):
+                        await self.__log(message, f"ERROR: Argument empty")
+                    else:
+                        text = message.content[1 + len(k):]
+                        await f(message, text)
+                await self.__timeout_delete(message)
                 return
 
         # tts channel
@@ -131,19 +132,17 @@ class Bot:
 
     async def say_text(self, message: discord.Message, text: str):
         """!say <text>: say text or <text>: say text in tts channel"""
-        for i, w in enumerate(text.split(" ")):
+        words = text.split(" ")
+        for i, w in enumerate(words):
             if w.startswith("<@!") and w.endswith(">"):
-                text = "men sần cái lồn, bố mày đéo đọc được"
-                break
+                words[i] = "mention"
+        text = " ".join(words)
         await self.__tts(text)
         await self.__say_mp3file(message, self.config["tts_path"])
 
     async def say_line(self, message: discord.Message, line: str):
         """!line <line>: say line"""
-        line_list = []
-        for filename in os.listdir(self.config["line_dir"]):
-            line_list.append('.'.join(filename.split('.')[:-1]))
-
+        line_list = await self.__get_lines()
         score_list = [jaro_winkler(l, line) for l in line_list]
         line = line_list[score_list.index(max(score_list))]
 
@@ -172,15 +171,23 @@ class Bot:
         for k, v in self.config.__dict__().items():
             help_message += f"\t{k}: {v}\n"
         help_message += "LINE AVAILABLE:\n"
-        for filename in os.listdir(self.config["line_dir"]):
-            help_message += f"\t{'.'.join(filename.split('.')[:-1])}"
+        for line in await self.__get_lines():
+            help_message += f"\t{line}"
+        help_message += "\n"
 
         await self.__log(message, help_message)
 
+    async def __get_lines(self) -> List[str]:
+        return [".".join(filename.split('.')[:-1]) for filename in os.listdir(self.config["line_dir"])]
+
     async def __log(self, message: discord.Message, text: str):
         m = await message.channel.send(text)
+        await self.__timeout_delete(m)
+
+    async def __timeout_delete(self, message: discord.Message):
         await asyncio.sleep(self.config["log_timeout"])
-        await m.delete()
+        await message.delete()
+
 
     async def __tts(self, text: str):
         gtts.gTTS(text=text, lang=self.config["lang"]).save(self.config["tts_path"])
