@@ -91,37 +91,32 @@ class Bot:
         for k, f in self.command.items():
             if message.content == k:
                 if message.author.discriminator in self.config["ban_list"]:
-                    await message.delete()
                     await self.__log(
                         message,
                         f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
                     )
-                else:
-                    await f(message)
-                await self.__timeout_delete(message)
+                    return
+                await f(message)
                 return
         # command with args
         for k, f in self.command_with_args.items():
             if message.content.startswith(k + " "):
                 if message.author.discriminator in self.config["ban_list"]:
-                    await message.delete()
                     await self.__log(
                         message,
                         f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
                     )
-                else:
-                    if len(message.content) < 1 + len(k):
-                        await self.__log(message, f"ERROR: Argument empty")
-                    else:
-                        text = message.content[1 + len(k):]
-                        await f(message, text)
-                await self.__timeout_delete(message)
+                    return
+                if len(message.content) < 1 + len(k):
+                    await self.__log(message, f"ERROR: Argument empty")
+                    return
+                text = message.content[1 + len(k):]
+                await f(message, text)
                 return
 
         # tts channel
         if message.channel.name == self.config["tts_channel"]:
             if message.author.discriminator in self.config["ban_list"]:
-                await message.delete()
                 await self.__log(
                     message,
                     f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
@@ -182,13 +177,8 @@ class Bot:
 
     async def __log(self, message: discord.Message, text: str):
         m = await message.channel.send(text)
-        await self.__timeout_delete(m)
-
-    async def __timeout_delete(self, message: discord.Message):
         await asyncio.sleep(self.config["log_timeout"])
-        await message.delete()
-        return
-
+        await m.delete()
 
     async def __tts(self, text: str):
         gtts.gTTS(text=text, lang=self.config["lang"]).save(self.config["tts_path"])
