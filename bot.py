@@ -187,6 +187,7 @@ class Bot:
     async def __timeout_delete(self, message: discord.Message):
         await asyncio.sleep(self.config["log_timeout"])
         await message.delete()
+        return
 
 
     async def __tts(self, text: str):
