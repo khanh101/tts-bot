@@ -6,7 +6,7 @@ from typing import Dict, Any, Optional
 
 import discord
 import gtts
-import nltk
+from Levenshtein import jaro_winkler
 
 
 class Config:
@@ -144,15 +144,10 @@ class Bot:
         for filename in os.listdir(self.config["line_dir"]):
             line_list.append('.'.join(filename.split('.')[:-1]))
 
-        best_line = line_list[0]
-        best_dist = nltk.edit_distance(best_line, line) / len(best_line)
-        for i in range(1, len(line_list)):
-            dist = nltk.edit_distance(line_list[i], line) / len(line_list[i])
-            if dist < best_dist:
-                best_dist = dist
-                best_line = line_list[i]
+        score_list = [jaro_winkler(l, line) for l in line_list]
+        line = line_list[score_list.index(max(score_list))]
 
-        line_path = os.path.join(self.config["line_dir"], best_line) + ".mp3"
+        line_path = os.path.join(self.config["line_dir"], line) + ".mp3"
         await self.__say_mp3file(message, line_path)
 
     async def set_lang(self, message: discord.Message, lang: str):
