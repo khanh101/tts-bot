@@ -2,16 +2,8 @@
 
 discord bot
 
-## how to use
+## useful links
 
-```
-HELP:
-    !howto: how to use
-    !say <text>: say text
-    !set_lang <lang>: set language
-    !special <special>: say special
-SETTINGS: 411063099185954817
-    lang:vi
-SPECIAL LIST:
-    no    airhorn    easiest    play2win    70tuoi    anhemconcac    devailon    ditmecuocdoi    cacbantuoigi    nextlevel    andaubuoi    nigga    wtfisthat    cosung    wegothim    illuminati    cuong    danhchetcha    nghia
-```
+- youtube to mp3: https://yt1s.com/youtube-to-mp3/en10
+- mp3 cut: https://mp3cut.net/vi/
+- mp3 normalize: http://mp3gain.flowsoft7.com/
