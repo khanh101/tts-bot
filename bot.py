@@ -86,7 +86,6 @@ class Bot:
         if author.bot:
             return
 
-        content: str = message.content
         # command
         for k, f in self.command.items():
             if message.content == k:

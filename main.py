@@ -9,6 +9,7 @@ while True:
 
         online = {}
 
+
         @client.event
         async def on_message(message: discord.message.Message):
             server_id = str(message.guild.id)
