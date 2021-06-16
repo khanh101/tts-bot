@@ -90,6 +90,7 @@ class Bot:
         # command
         for k, f in self.command.items():
             if message.content == k:
+                await self.__schedule_delete_message(message)
                 if message.author.discriminator in self.config["ban_list"]:
                     await self.__log(
                         message,
@@ -101,6 +102,7 @@ class Bot:
         # command with args
         for k, f in self.command_with_args.items():
             if message.content.startswith(k + " "):
+                await self.__schedule_delete_message(message)
                 if message.author.discriminator in self.config["ban_list"]:
                     await self.__log(
                         message,
@@ -175,11 +177,6 @@ class Bot:
     async def __get_lines(self) -> List[str]:
         return [".".join(filename.split('.')[:-1]) for filename in os.listdir(self.config["line_dir"])]
 
-    async def __log(self, message: discord.Message, text: str):
-        m = await message.channel.send(text)
-        await asyncio.sleep(self.config["log_timeout"])
-        await m.delete()
-
     async def __tts(self, text: str):
         gtts.gTTS(text=text, lang=self.config["lang"]).save(self.config["tts_path"])
 
@@ -205,6 +202,28 @@ class Bot:
         # last access
         self.last_access = int(time.time())
         self.voice_connected = True
+        await self.__schedule_disconnect_voice(message, bot_voice_client)
+
+    async def __log(self, message: discord.Message, text: str):
+        """log"""
+        m = await message.channel.send(text)
+        await self.__schedule_delete_message(m)
+
+    async def __schedule_disconnect_voice(self, message: discord.Message, bot_voice_client: discord.VoiceClient):
+        """schedule disconnecting voice after log_timeout"""
+        asyncio.ensure_future(self.__voice_disconnect_task(message, bot_voice_client))
+
+    async def __schedule_delete_message(self, message: discord.Message):
+        """schedule deleting message after log_timeout"""
+        asyncio.ensure_future(self.__del_message_task(message))
+
+    async def __del_message_task(self, message: discord.Message):
+        """task: delete message after log_timeout"""
+        await asyncio.sleep(self.config["log_timeout"])
+        await message.delete()
+
+    async def __voice_disconnect_task(self, message: discord.Message, bot_voice_client: discord.VoiceClient):
+        """task: disconnect voice after voice_timeout"""
         await asyncio.sleep(self.config["voice_timeout"])
         if int(time.time()) - self.last_access >= self.config["voice_timeout"] / 2:
             if self.voice_connected:
