@@ -30,8 +30,7 @@ class Config:
             })
 
     def __getitem__(self, key: str) -> Any:
-        config = self.__read()
-        return config.get(key, None)
+        return self.__read()[key]
 
     def __setitem__(self, key: str, value: Any):
         config = self.__read()
