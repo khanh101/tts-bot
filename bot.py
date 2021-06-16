@@ -208,7 +208,7 @@ class Bot:
         await self.__schedule_delete_message(m)
 
     async def __schedule_disconnect_voice(self, message: discord.Message, bot_voice_client: discord.VoiceClient):
-        """schedule disconnecting voice after log_timeout"""
+        """schedule disconnecting voice after voice_timeout"""
         asyncio.ensure_future(self.__disconnect_voice_task(message, bot_voice_client))
 
     async def __schedule_delete_message(self, message: discord.Message):
