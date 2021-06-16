@@ -65,8 +65,7 @@ class Bot:
         self.client: discord.Client = client
         self.server_id: str = server_id
         self.config: Config = Config(server_id)
-        self.last_access: Optional[int] = None
-        self.voice_connected: bool = False
+        self.last_voice_access: Optional[int] = None
         self.command = {
             "!howto": self.howto,
         }
@@ -198,8 +197,7 @@ class Bot:
         bot_voice_client.play(discord.FFmpegPCMAudio(source=file_path))
 
         # last access
-        self.last_access = int(time.time())
-        self.voice_connected = True
+        self.last_voice_access = int(time.time())
         await self.__schedule_disconnect_voice(message, bot_voice_client)
 
     async def __log(self, message: discord.Message, text: str):
@@ -223,8 +221,7 @@ class Bot:
     async def __disconnect_voice_task(self, message: discord.Message, bot_voice_client: discord.VoiceClient):
         """task: disconnect voice after voice_timeout"""
         await asyncio.sleep(self.config["voice_timeout"])
-        if int(time.time()) - self.last_access >= self.config["voice_timeout"] / 2:
-            if self.voice_connected:
-                self.voice_connected = False
-                await bot_voice_client.disconnect()
-                await self.__log(message, "WARNING: Voice has been disconnected due to inactivity")
+        elasped = int(time.time()) - self.last_voice_access
+        if bot_voice_client.is_connected() and elasped >= self.config["voice_timeout"] / 2:
+            await bot_voice_client.disconnect()
+            await self.__log(message, "WARNING: Voice has been disconnected due to inactivity")
