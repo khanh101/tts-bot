@@ -142,6 +142,7 @@ class Bot:
 
         line_path = os.path.join(self.config["line_dir"], line) + ".mp3"
         await self.__say_mp3file(message, line_path)
+        await self.__log(f"INFO: lining {line}")
 
     async def set_lang(self, message: discord.Message, lang: str):
         """!lang <lang>: set language"""
