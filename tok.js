@@ -1,0 +1,3 @@
+TOKEN="";
+
+module.exports = {TOKEN};
