@@ -1,6 +1,6 @@
 # tts-bot
 
-discord bot
+discord text to speech bot
 
 ## useful links
 
