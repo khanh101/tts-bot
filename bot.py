@@ -150,7 +150,7 @@ class Bot:
             gtts.gTTS("hello", lang=lang)
         except ValueError as e:
             await self.__log(message, f"ERROR: {e}")
-            await self.__log(message, "INFO: Current language: {self.config['lang']}")
+            await self.__log(message, f"INFO: Current language: {self.config['lang']}")
             return
         self.config["lang"] = lang
         await self.__log(message, f"WARNING: Language was set into {lang}")
