@@ -1,7 +1,7 @@
 import discord
 
-from bot import Bot
-from handle import handle
+from context import Config, Context
+from function import handle
 from tok import TOKEN
 
 while True:
@@ -28,8 +28,8 @@ while True:
 
             server_id = str(message.guild.id)
             if server_id not in online:
-                online[server_id] = Bot(client, server_id)
-            await handle(online[server_id], message)
+                online[server_id] = Config(server_id)
+            await handle(Context(client, online[server_id], message))
 
 
         client.run(TOKEN)

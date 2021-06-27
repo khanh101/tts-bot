@@ -1,13 +1,13 @@
 import json
 import os
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Iterable
 
 import discord
 
 
-class Config:
+class OfflineConfig:
     """
-    Config: a wrapper for a json file
+    OfflineConfig: a wrapper for a json file
     """
 
     def __init__(self, server_id: str):
@@ -60,16 +60,28 @@ class Config:
             return json.load(f)
 
 
-class Bot:
+class Config:
     """
-    Bot : a pair of discord.Client and server_id. Bot contains server's config and other properties
+    Config :
     """
 
-    def __init__(self, client: discord.Client, server_id: str):
-        self.client: discord.Client = client
+    def __init__(self, server_id: str):
         self.server_id: str = server_id
-        self.config: Config = Config(server_id)
+        self.offline: OfflineConfig = OfflineConfig(server_id)
         self.last_voice_access: Optional[int] = None
 
-    def get_lines(self) -> List[str]:
-        return [".".join(filename.split('.')[:-1]) for filename in os.listdir(self.config["line_dir"])]
+    def lines(self) -> List[str]:
+        return [".".join(filename.split('.')[:-1]) for filename in os.listdir(self.offline["line_dir"])]
+
+
+class Context:
+    """
+    Context :
+    """
+    def __init__(self, client: discord.Client, config: Config, message: discord.Message):
+        self.client = client
+        self.config = config
+        self.message = message
+
+    def __iter__(self) -> Iterable:
+        return iter((self.client, self.config, self.message))
