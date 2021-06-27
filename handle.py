@@ -1,6 +1,7 @@
 import asyncio
 import os
 import time
+from enum import Enum
 from typing import Optional
 
 import discord
@@ -35,7 +36,7 @@ async def handle(bot: Bot, message: discord.Message):
             if await __filter_banned_user(bot, message):
                 return
             if len(message.content) < 1 + len(k):
-                await __log(bot, message, f"ERROR: Argument empty")
+                await __log(bot, message, LogType.ERROR, f"Argument empty")
                 return
             text = message.content[1 + len(k):]
             await f(bot, message, text)
@@ -68,7 +69,7 @@ async def say_line(bot: Bot, message: discord.Message, line: str):
 
     line_path = os.path.join(bot.config["line_dir"], line) + ".mp3"
     await __say_mp3file(bot, message, line_path)
-    await __log(bot, message, f"INFO: lining {line}")
+    await __log(bot, message, LogType.INFO, f"lining {line}")
 
 
 async def set_lang(bot: Bot, message: discord.Message, lang: str):
@@ -76,11 +77,10 @@ async def set_lang(bot: Bot, message: discord.Message, lang: str):
     try:
         gtts.gTTS("hello", lang=lang)
     except ValueError as e:
-        await __log(bot, message, f"ERROR: {e}")
-        await __log(bot, message, f"INFO: Current language: {bot.config['lang']}")
+        await __log(bot, message, LogType.ERROR, f"ERROR: {e}\nCurrent language: {bot.config['lang']}")
         return
     bot.config["lang"] = lang
-    await __log(bot, message, f"WARNING: Language was set into {lang}")
+    await __log(bot, message, LogType.WARNING, f"Language was set into {lang}")
 
 
 async def howto(bot: Bot, message: discord.Message):
@@ -98,7 +98,7 @@ async def howto(bot: Bot, message: discord.Message):
         help_message += f"\t{line}"
     help_message += "\n"
 
-    await __log(bot, message, help_message)
+    await __log(bot, message, LogType.INFO, help_message)
 
 
 async def __filter_banned_user(bot: Bot, message: discord.Message) -> bool:
@@ -107,7 +107,8 @@ async def __filter_banned_user(bot: Bot, message: discord.Message) -> bool:
     await __log(
         bot,
         message,
-        f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
+        LogType.WARNING,
+        f"{message.author.name}#{message.author.discriminator} has been banned",
     )
     return True
 
@@ -120,7 +121,7 @@ async def __say_mp3file(bot: Bot, message: discord.Message, file_path: str):
     # ensure author is in a voice channel
     author_voice_state: Optional[discord.VoiceState] = message.author.voice
     if author_voice_state is None:
-        await __log(bot, message, f"ERROR: {message.author} is not in any voice channel")
+        await __log(bot, message, LogType.ERROR, f"{message.author} is not in any voice channel")
         return
     # ensure bot and author in the same voice channel
     author_voice_channel: discord.VoiceChannel = author_voice_state.channel
@@ -140,9 +141,19 @@ async def __say_mp3file(bot: Bot, message: discord.Message, file_path: str):
     await __schedule_disconnect_voice(bot, message, bot_voice_client)
 
 
-async def __log(bot: Bot, message: discord.Message, text: str):
+class LogType(Enum):
+    INFO = ("INFO", 0x00FF00)
+    WARNING = ("WARNING", 0xFFFF00)
+    ERROR = ("ERROR", 0xFF0000)
+
+
+async def __log(bot: Bot, message: discord.Message, logtype: LogType, text: str):
     """log"""
-    m = await message.channel.send(text)
+    m = await message.channel.send(embed=discord.Embed(
+        title=logtype.value[0],
+        colour=logtype.value[1],
+        description=text,
+    ))
     await __schedule_delete_message(bot, m)
 
 
@@ -168,7 +179,7 @@ async def __disconnect_voice_task(bot: Bot, message: discord.Message, bot_voice_
     elapsed = int(time.time()) - bot.last_voice_access
     if bot_voice_client.is_connected() and elapsed >= bot.config["voice_timeout"] / 2:
         await bot_voice_client.disconnect()
-        await __log(bot, message, "WARNING: Voice has been disconnected due to inactivity")
+        await __log(bot, message, LogType.INFO, "Voice has been disconnected due to inactivity")
 
 
 command = {
