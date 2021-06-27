@@ -11,6 +11,7 @@ from bot import Bot
 
 
 async def handle(bot: Bot, message: discord.Message):
+    """handle a message with bot"""
     author: discord.member.Member = message.author
     # filter out bot message
     if author == bot.client.user:
@@ -173,8 +174,10 @@ async def __disconnect_voice_task(bot: Bot, message: discord.Message, bot_voice_
 command = {
     "!howto": howto,
 }
+"""command"""
 command_with_args = {
     "!say": say_text,
     "!lang": set_lang,
     "!line": say_line,
 }
+"""command with arguments"""

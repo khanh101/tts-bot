@@ -6,6 +6,9 @@ import discord
 
 
 class Config:
+    """
+    Config: a wrapper for a json file
+    """
     def __init__(self, server_id: str):
         self.server_id: str = server_id
 
@@ -57,6 +60,9 @@ class Config:
 
 
 class Bot:
+    """
+    Bot : a pair of discord.Client and server_id. Bot contains server's config and other properties
+    """
     def __init__(self, client: discord.Client, server_id: str):
         self.client: discord.Client = client
         self.server_id: str = server_id
