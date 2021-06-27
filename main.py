@@ -1,6 +1,7 @@
 import discord
 
 from bot import Bot
+from handle import handle
 from tok import TOKEN
 
 while True:
@@ -15,7 +16,7 @@ while True:
             server_id = str(message.guild.id)
             if server_id not in online:
                 online[server_id] = Bot(client, server_id)
-            await online[server_id].handle(message)
+            await handle(online[server_id], message)
 
 
         client.run(TOKEN)
