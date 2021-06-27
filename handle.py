@@ -24,7 +24,7 @@ async def handle(bot: Bot, message: discord.Message):
     for k, f in command.items():
         if message.content == k:
             await __schedule_delete_message(bot, message)
-            if __filter_banned_user(bot, message):
+            if await __filter_banned_user(bot, message):
                 return
             await f(bot, message)
             return
@@ -32,7 +32,7 @@ async def handle(bot: Bot, message: discord.Message):
     for k, f in command_with_args.items():
         if message.content.startswith(k + " "):
             await __schedule_delete_message(bot, message)
-            if __filter_banned_user(bot, message):
+            if await __filter_banned_user(bot, message):
                 return
             if len(message.content) < 1 + len(k):
                 await __log(bot, message, f"ERROR: Argument empty")
@@ -43,7 +43,7 @@ async def handle(bot: Bot, message: discord.Message):
 
     # tts channel
     if message.channel.name == bot.config["tts_channel"]:
-        if __filter_banned_user(bot, message):
+        if await __filter_banned_user(bot, message):
             return
         await say_text(bot, message, message.content)
         return
