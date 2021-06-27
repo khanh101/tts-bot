@@ -68,8 +68,8 @@ async def say_line(bot: Bot, message: discord.Message, line: str):
     line = line_list[score_list.index(max(score_list))]
 
     line_path = os.path.join(bot.config["line_dir"], line) + ".mp3"
-    await __say_mp3file(bot, message, line_path)
     await __log(bot, message, LogType.INFO, f"lining {line}")
+    await __say_mp3file(bot, message, line_path)
 
 
 async def set_lang(bot: Bot, message: discord.Message, lang: str):
