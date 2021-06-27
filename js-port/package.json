@@ -4,6 +4,7 @@
   "description": "Discord bot for SitePoint",
   "main": "index.js",
   "scripts": {
+    "start": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/bin/index.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Michiel Mulders",
@@ -11,5 +12,10 @@
   "dependencies": {
     "discord.js": "^11.5.1",
     "dotenv": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^15.12.5",
+    "nodemon": "^2.0.7",
+    "tsc-watch": "^4.4.0"
   }
 }
