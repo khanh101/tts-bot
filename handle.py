@@ -14,7 +14,7 @@ from bot import Bot
 async def handle(bot: Bot, message: discord.Message):
     """handle a message with bot"""
     author: discord.member.Member = message.author
-    # filter out bot message
+    # filter out self message
     if author == bot.client.user:
         return
     # filter out bot message
