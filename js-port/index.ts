@@ -1,5 +1,7 @@
-import 'dotenv';
-import Discord = require('discord.js');
+import * as dotenv from 'dotenv';
+import * as Discord from 'discord.js';
+dotenv.config({ path: __dirname+'/.env' });
+
 const bot = new Discord.Client();
 const TOKEN = process.env.TOKEN;
 
@@ -19,7 +21,7 @@ bot.on('message', msg => {
       const taggedUser = msg.mentions.users.first();
       msg.channel.send(`You wanted to kick: ${taggedUser.username}`);
     } else {
-      msg.reply('Please tag a valid user!');
+      msg.reply('Please tag a valid user!OK');
     }
   }
 });

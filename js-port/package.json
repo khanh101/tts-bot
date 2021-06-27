@@ -4,7 +4,7 @@
   "description": "Discord bot for SitePoint",
   "main": "index.js",
   "scripts": {
-    "start": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/bin/index.js\"",
+    "start": "cp .env ./dist/.env && tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/index.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Michiel Mulders",
