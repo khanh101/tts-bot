@@ -11,6 +11,7 @@ from bot import Bot
 
 
 async def handle(bot: Bot, message: discord.Message):
+    """handle a message with bot"""
     author: discord.member.Member = message.author
     # filter out bot message
     if author == bot.client.user:
@@ -23,12 +24,7 @@ async def handle(bot: Bot, message: discord.Message):
     for k, f in command.items():
         if message.content == k:
             await __schedule_delete_message(bot, message)
-            if message.author.discriminator in bot.config["ban_list"]:
-                await __log(
-                    bot,
-                    message,
-                    f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
-                )
+            if __filter_banned_user(bot, message):
                 return
             await f(bot, message)
             return
@@ -36,12 +32,7 @@ async def handle(bot: Bot, message: discord.Message):
     for k, f in command_with_args.items():
         if message.content.startswith(k + " "):
             await __schedule_delete_message(bot, message)
-            if message.author.discriminator in bot.config["ban_list"]:
-                await __log(
-                    bot,
-                    message,
-                    f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
-                )
+            if __filter_banned_user(bot, message):
                 return
             if len(message.content) < 1 + len(k):
                 await __log(bot, message, f"ERROR: Argument empty")
@@ -52,12 +43,7 @@ async def handle(bot: Bot, message: discord.Message):
 
     # tts channel
     if message.channel.name == bot.config["tts_channel"]:
-        if message.author.discriminator in bot.config["ban_list"]:
-            await __log(
-                bot,
-                message,
-                f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
-            )
+        if __filter_banned_user(bot, message):
             return
         await say_text(bot, message, message.content)
         return
@@ -113,6 +99,17 @@ async def howto(bot: Bot, message: discord.Message):
     help_message += "\n"
 
     await __log(bot, message, help_message)
+
+
+async def __filter_banned_user(bot: Bot, message: discord.Message) -> bool:
+    if message.author.discriminator not in bot.config["ban_list"]:
+        return False
+    await __log(
+        bot,
+        message,
+        f"WARNING: {message.author.name}#{message.author.discriminator} has been banned",
+    )
+    return True
 
 
 async def __tts(bot: Bot, text: str):
@@ -177,8 +174,10 @@ async def __disconnect_voice_task(bot: Bot, message: discord.Message, bot_voice_
 command = {
     "!howto": howto,
 }
+"""command"""
 command_with_args = {
     "!say": say_text,
     "!lang": set_lang,
     "!line": say_line,
 }
+"""command with arguments"""
