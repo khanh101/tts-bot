@@ -227,32 +227,35 @@ async def __schedule_delete_message(ctx: Context):
 
 async def __resp_info(ctx: Context, text: str):
     bot, client, config, message = ctx
-    await __schedule_delete_message(
+    await __schedule_delete_message(Context(
+        bot, client, config,
         await message.channel.send(embed=discord.Embed(
             title="**INFO**",
             colour=0x00FF00,
             description=text,
         ).set_footer(text="INFO: intended use, need not to read")),
-    )
+    ))
 
 
 async def __resp_warning(ctx: Context, text: str):
     bot, client, config, message = ctx
-    await __schedule_delete_message(
+    await __schedule_delete_message(Context(
+        bot, client, config,
         await message.channel.send(embed=discord.Embed(
             title="**WARNING**",
-            colour=0x00FF00,
+            colour=0xFFFF00,
             description=text,
-        ).set_footer(text="INFO: intended use, need not to read")),
-    )
+        ).set_footer(text="WARNING: intended use, need not to read")),
+    ))
 
 
 async def __resp_error(ctx: Context, text: str):
     bot, client, config, message = ctx
-    await __schedule_delete_message(
+    await __schedule_delete_message(Context(
+        bot, client, config,
         await message.channel.send(embed=discord.Embed(
             title="**ERROR**",
             colour=0xFF0000,
             description=text,
-        ).set_footer(text="ERROR: not intended use, need to read")),
-    )
+        ).set_footer(text="ERROR: not intended use, need not to read")),
+    ))
