@@ -29,8 +29,8 @@ if __name__ == "__main__":
 
 
             @client.event
-            async def on_message(message: discord.message.Message):
-                author: discord.member.Member = message.author
+            async def on_message(message: discord.Message):
+                author: discord.Member = message.author
                 # filter out self message
                 if author == client.user:
                     return

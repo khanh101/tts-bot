@@ -95,7 +95,11 @@ async def say_text(ctx: Context, text: str):
 
     # replace mention by nickname
     for user in message.mentions:
-        text = text.replace(user.mention, user.nick)
+        if user.nick is not None:
+            nick = user.nick
+        else:
+            nick = user.name
+        text = text.replace(user.mention, nick)
 
     await __tts(ctx, text)
     await __say_mp3file(ctx, config.offline["tts_path"])
