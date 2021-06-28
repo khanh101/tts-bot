@@ -1,16 +1,25 @@
+import os
+
 import discord
 
-from context import Config, Context
-from function import handle
+from bot.template import Context, handle
+from bot.tts_bot import TTSConfig, tts_bot
 from tok import TOKEN
 
 
 def init():
-    import bot
+    import bot.tts_bot # neccessary for function
+    pass
 
 
 if __name__ == "__main__":
     init()
+
+    # create config and line dir
+    if not os.path.exists("cfg"):
+        os.mkdir("cfg")
+    if not os.path.exists("line"):
+        os.mkdir("line")
 
     while True:
         try:
@@ -36,8 +45,8 @@ if __name__ == "__main__":
 
                 server_id = str(message.guild.id)
                 if server_id not in online:
-                    online[server_id] = Config(server_id)
-                await handle(Context(client, online[server_id], message))
+                    online[server_id] = TTSConfig(server_id, os.path.join("cfg", f"cfg_{server_id}.json"), "line")
+                await handle(Context(tts_bot, client, online[server_id], message))
 
 
             client.run(TOKEN)
