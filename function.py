@@ -145,9 +145,9 @@ async def __say_mp3file(ctx: Context, file_path: str):
 
 
 class LogType(Enum):
-    INFO = ("INFO", 0x00FF00)
-    WARNING = ("WARNING", 0xFFFF00)
-    ERROR = ("ERROR", 0xFF0000)
+    INFO = ("INFO: intended use, need not to read", 0x00FF00)
+    WARNING = ("WARNING: intended use, need to read", 0xFFFF00)
+    ERROR = ("ERROR: not intended use, need to read", 0xFF0000)
 
 
 async def __log(ctx: Context, logtype: LogType, text: str):
