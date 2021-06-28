@@ -6,6 +6,7 @@ from typing import Optional
 
 import discord
 import gtts
+import gtts.lang
 from Levenshtein import jaro_winkler
 
 from context import Context
@@ -81,7 +82,7 @@ async def set_lang(ctx: Context, lang: str):
     try:
         gtts.gTTS("hello", lang=lang)
     except ValueError as e:
-        await __log(ctx, LogType.ERROR, f"ERROR: {e}\nCurrent language: {config.offline['lang']}")
+        await __log(ctx, LogType.ERROR, f"{e}\nCurrent language: {config.offline['lang']}")
         return
     config.offline["lang"] = lang
     await __log(ctx, LogType.WARNING, f"Language was set into {lang}")
@@ -101,6 +102,10 @@ async def howto(ctx: Context):
     help_message += "LINE AVAILABLE:\n"
     for line in config.lines():
         help_message += f"\t{line}"
+    help_message += "\n"
+    help_message += "LANG AVAILABLE:\n"
+    for lang in gtts.lang.tts_langs():
+        help_message += f"\t{lang}"
     help_message += "\n"
 
     await __log(ctx, LogType.INFO, help_message)
@@ -145,9 +150,9 @@ async def __say_mp3file(ctx: Context, file_path: str):
 
 
 class LogType(Enum):
-    INFO = ("INFO: intended use, need not to read", 0x00FF00)
-    WARNING = ("WARNING: intended use, need to read", 0xFFFF00)
-    ERROR = ("ERROR: not intended use, need to read", 0xFF0000)
+    INFO = ("**INFO**", "intended use, need not to read", 0x00FF00)
+    WARNING = ("**WARNING**", "intended use, need to read", 0xFFFF00)
+    ERROR = ("**ERROR**", "not intended use, need to read", 0xFF0000)
 
 
 async def __log(ctx: Context, logtype: LogType, text: str):
@@ -155,37 +160,40 @@ async def __log(ctx: Context, logtype: LogType, text: str):
     client, config, message = ctx
     m = await message.channel.send(embed=discord.Embed(
         title=logtype.value[0],
-        colour=logtype.value[1],
+        colour=logtype.value[2],
         description=text,
-    ))
+    ).set_footer(text=logtype.value[1]))
     await __schedule_delete_message(Context(client, config, m))
 
 
 async def __schedule_disconnect_voice(ctx: Context, bot_voice_client: discord.VoiceClient):
     """schedule disconnecting voice after voice_timeout"""
-    asyncio.ensure_future(__disconnect_voice_task(ctx, bot_voice_client))
+
+    async def __disconnect_voice_task():
+        """task: disconnect voice after voice_timeout"""
+        client, config, message = ctx
+        await asyncio.sleep(config.offline["voice_timeout"])
+        elapsed = int(time.time()) - config.last_voice_access
+        if bot_voice_client.is_connected() and elapsed >= config.offline["voice_timeout"] / 2:
+            await bot_voice_client.disconnect()
+            await __log(ctx, LogType.INFO, "Voice has been disconnected due to inactivity")
+
+    asyncio.ensure_future(__disconnect_voice_task())
 
 
 async def __schedule_delete_message(ctx: Context):
     """schedule deleting message after log_timeout"""
-    asyncio.ensure_future(__delete_message_task(ctx))
 
+    async def __delete_message_task():
+        """task: delete message after log_timeout"""
+        client, config, message = ctx
+        await asyncio.sleep(config.offline["log_timeout"])
+        try:
+            await message.delete()
+        except discord.errors.NotFound:
+            pass
 
-async def __delete_message_task(ctx: Context):
-    """task: delete message after log_timeout"""
-    client, config, message = ctx
-    await asyncio.sleep(config.offline["log_timeout"])
-    await message.delete()
-
-
-async def __disconnect_voice_task(ctx: Context, bot_voice_client: discord.VoiceClient):
-    """task: disconnect voice after voice_timeout"""
-    client, config, message = ctx
-    await asyncio.sleep(config.offline["voice_timeout"])
-    elapsed = int(time.time()) - config.last_voice_access
-    if bot_voice_client.is_connected() and elapsed >= config.offline["voice_timeout"] / 2:
-        await bot_voice_client.disconnect()
-        await __log(ctx, LogType.INFO, "Voice has been disconnected due to inactivity")
+    asyncio.ensure_future(__delete_message_task())
 
 
 command = {

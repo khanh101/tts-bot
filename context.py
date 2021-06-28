@@ -78,6 +78,7 @@ class Context:
     """
     Context :
     """
+
     def __init__(self, client: discord.Client, config: Config, message: discord.Message):
         self.client = client
         self.config = config
