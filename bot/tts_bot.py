@@ -89,6 +89,7 @@ async def say_text_default(ctx: Context):
 @command_with_args(tts_bot, "!say")
 async def say_text(ctx: Context, text: str):
     """!say <text>: say text or <text>: say text in tts channel"""
+    await __schedule_delete_message(ctx)
     if await __filter_banned_user(ctx):
         return
     bot, client, config, message = ctx
@@ -104,6 +105,7 @@ async def say_text(ctx: Context, text: str):
 @command_with_args(tts_bot, "!line")
 async def say_line(ctx: Context, line: str):
     """!line <line>: say line"""
+    await __schedule_delete_message(ctx)
     if await __filter_banned_user(ctx):
         return
     bot, client, config, message = ctx
@@ -119,6 +121,7 @@ async def say_line(ctx: Context, line: str):
 @command_with_args(tts_bot, "!lang")
 async def set_lang(ctx: Context, lang: str):
     """!lang <lang>: set language"""
+    await __schedule_delete_message(ctx)
     if await __filter_banned_user(ctx):
         return
     bot, client, config, message = ctx
@@ -134,6 +137,7 @@ async def set_lang(ctx: Context, lang: str):
 @command(tts_bot, "!howto")
 async def howto(ctx: Context):
     """!howto: help"""
+    await __schedule_delete_message(ctx)
     if await __filter_banned_user(ctx):
         return
     bot, client, config, message = ctx
