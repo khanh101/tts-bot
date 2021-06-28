@@ -18,6 +18,7 @@ default_command: Optional[Command] = None
 
 
 def command(key: str):
+    """command"""
     def create_command(f: Command) -> Command:
         command_dict[key] = f
         return f
@@ -26,6 +27,7 @@ def command(key: str):
 
 
 def command_with_args(key: str):
+    """command with args"""
     def create_command(f: CommandwithArgs) -> CommandwithArgs:
         command_with_args_dict[key] = f
         return f
@@ -34,7 +36,10 @@ def command_with_args(key: str):
 
 
 def default(f: Command) -> Command:
+    """default command"""
     global default_command
+    if default_command is not None:
+        raise Exception("default command must be set at most once")
     default_command = f
     return f
 
