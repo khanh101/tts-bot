@@ -93,11 +93,11 @@ async def say_text(ctx: Context, text: str):
     if await __filter_banned_user(ctx):
         return
     bot, client, config, message = ctx
-    words = text.split(" ")
-    for i, w in enumerate(words):
-        if w.startswith("<@!") and w.endswith(">"):
-            words[i] = "mention"
-    text = " ".join(words)
+
+    # replace mention by nickname
+    for user in message.mentions:
+        text = text.replace(user.mention, user.nick)
+
     await __tts(ctx, text)
     await __say_mp3file(ctx, config.offline["tts_path"])
 
