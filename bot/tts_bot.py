@@ -89,7 +89,6 @@ async def say_text_default(ctx: Context):
 @command_with_args(tts_bot, "!say")
 async def say_text(ctx: Context, text: str):
     """!say <text>: say text or <text>: say text in tts channel"""
-    await __schedule_delete_message(ctx)
     if await __filter_banned_user(ctx):
         return
     bot, client, config, message = ctx
