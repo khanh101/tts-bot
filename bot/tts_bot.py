@@ -94,12 +94,16 @@ async def say_text(ctx: Context, text: str):
     bot, client, config, message = ctx
 
     # replace mention by nickname
+    # remove all !
+    text = text.replace("!", "")
     for user in message.mentions:
         if user.nick is not None:
             nick = user.nick
         else:
             nick = user.name
-        text = text.replace(user.mention, nick)
+        mention = user.mention
+        mention = mention.replace("!", "")
+        text = text.replace(mention, nick)
 
     await __tts(ctx, text)
     await __say_mp3file(ctx, config.offline["tts_path"])
