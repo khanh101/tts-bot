@@ -1,8 +1,7 @@
 import asyncio
-import json
 import os
 import time
-from typing import Optional, Any, Dict, List
+from typing import Optional, List
 
 import discord
 import gtts
@@ -10,61 +9,24 @@ import gtts.lang
 from Levenshtein import jaro_winkler
 
 from bot.template import Config, Bot, default, Context, command_with_args, command
+from bot.utils import JsonObject
 
 
 class TTSConfig(Config):
-    class OfflineConfig:
-        """
-        OfflineConfig: a wrapper for a json file
-        """
-
-        def __init__(self, server_id: str, config_path: str, line_dir: str):
-            self.server_id: str = server_id
-            self.config_path: str = config_path
-            self.line_dir: str = line_dir
-
-        def __ensure(self):
-            if not os.path.exists(self.config_path):
-                self.__write({
-                    "tts_channel": "tts-bot",
-                    "lang": "vi",
-                    "voice_timeout": 3600,
-                    "resp_timeout": 30,
-                    "ban_list": [],
-                    "tts_path": f"tts_{self.server_id}.mp3",
-                    "line_dir": self.line_dir,
-                })
-
-        def __getitem__(self, key: str) -> Any:
-            return self.__read()[key]
-
-        def __setitem__(self, key: str, value: Any):
-            config = self.__read()
-            config[key] = value
-            self.__write(config)
-
-        def __dict__(self) -> Dict[str, Any]:
-            config = self.__read()
-            return {
-                "tts_channel": config["tts_channel"],
-                "lang": config["lang"],
-                "voice_timeout": config["voice_timeout"],
-                "resp_timeout": config["resp_timeout"],
-                "ban_list": config["ban_list"],
-            }
-
-        def __write(self, config: Dict[str, Any]):
-            with open(self.config_path, "w") as f:
-                json.dump(config, f, indent=4)
-
-        def __read(self) -> Dict[str, Any]:
-            self.__ensure()
-            with open(self.config_path, "r") as f:
-                return json.load(f)
-
     def __init__(self, server_id: str, config_path: str, line_dir: str):
         self.server_id: str = server_id
-        self.offline: TTSConfig.OfflineConfig = TTSConfig.OfflineConfig(server_id, config_path, line_dir)
+        self.offline: JsonObject = JsonObject(
+            config_path=config_path,
+            default={
+                "tts_channel": "tts-bot",
+                "lang": "vi",
+                "voice_timeout": 3600,
+                "resp_timeout": 30,
+                "ban_list": [],
+                "tts_path": f"tts_{server_id}.mp3",
+                "line_dir": line_dir,
+            },
+        )
         self.last_voice_access: Optional[int] = None
 
     def lines(self) -> List[str]:
@@ -89,15 +51,22 @@ async def say_text_default(ctx: Context):
 @command_with_args(tts_bot, "!say")
 async def say_text(ctx: Context, text: str):
     """!say <text>: say text or <text>: say text in tts channel"""
-    await __schedule_delete_message(ctx)
     if await __filter_banned_user(ctx):
         return
     bot, client, config, message = ctx
-    words = text.split(" ")
-    for i, w in enumerate(words):
-        if w.startswith("<@!") and w.endswith(">"):
-            words[i] = "mention"
-    text = " ".join(words)
+
+    # replace mention by nickname
+    # remove all !
+    text = text.replace("!", "")
+    for user in message.mentions:
+        if user.nick is not None:
+            nick = user.nick
+        else:
+            nick = user.name
+        mention = user.mention
+        mention = mention.replace("!", "")
+        text = text.replace(mention, nick)
+
     await __tts(ctx, text)
     await __say_mp3file(ctx, config.offline["tts_path"])
 
