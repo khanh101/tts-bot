@@ -10,10 +10,25 @@ class Config:
 
 class Bot:
     """Bot : Bot configurations"""
+
     def __init__(self):
         self.command_dict = {}
         self.command_with_args_dict = {}
         self.default = None
+
+    def __repr__(self) -> str:
+        out = ""
+        out += "COMMAND\n"
+        for k, f in self.command_dict.items():
+            out += f"\t{k} : {f.__doc__}\n"
+        out += "\n"
+        out += "COMMAND WITH ARGS\n"
+        for k, f in self.command_with_args_dict.items():
+            out += f"\t{k} <args> : {f.__doc__}\n"
+        out += "\n"
+        out += "DEFAULT\n"
+        out += f"default : {self.default.__doc__}\n"
+        return out
 
 
 class Context:

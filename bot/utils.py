@@ -1,6 +1,7 @@
+import copy
 import json
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Optional, List, Tuple, Union, Iterable
 
 
 class JsonObject:
@@ -26,14 +27,19 @@ class JsonObject:
         config[key] = value
         self.__write(config)
 
-    def __dict__(self) -> Dict[str, Any]:
-        return self.__read()
+    def items(self) -> Iterable[Union[Any, Tuple[Any, Any]]]:
+        config = self.__read()
+        if isinstance(config, list):
+            return config
+        if isinstance(config, dict):
+            return config.items()
+        raise Exception("PANIC: config type must not be here")
 
-    def __write(self, config: Dict[str, Any]):
+    def __write(self, config: Any):
         with open(self.__config_path, "w") as f:
             json.dump(config, f, indent=4)
 
-    def __read(self) -> Dict[str, Any]:
+    def __read(self) -> Any:
         self.__ensure()
         with open(self.__config_path, "r") as f:
             return json.load(f)

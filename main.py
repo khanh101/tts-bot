@@ -8,8 +8,8 @@ from tok import TOKEN
 
 
 def init():
-    import bot.tts_bot # neccessary for function
-    pass
+    import bot.tts_bot  # neccessary for function
+    print(f"{bot.tts_bot.tts_bot}")
 
 
 if __name__ == "__main__":

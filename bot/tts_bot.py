@@ -39,7 +39,7 @@ tts_bot = Bot()
 
 @default(tts_bot)
 async def say_text_default(ctx: Context):
-    """default action"""
+    """say text in tts_channel"""
     # tts channel
     bot, client, config, message = ctx
     if message.channel.name == config.offline["tts_channel"]:
@@ -51,7 +51,7 @@ async def say_text_default(ctx: Context):
 
 @command_with_args(tts_bot, "!say")
 async def say_text(ctx: Context, text: str):
-    """!say <text>: say text or <text>: say text in tts channel"""
+    """say text"""
     if await __filter_banned_user(ctx):
         return
     bot, client, config, message = ctx
@@ -74,7 +74,7 @@ async def say_text(ctx: Context, text: str):
 
 @command_with_args(tts_bot, "!line")
 async def say_line(ctx: Context, line: str):
-    """!line <line>: say line"""
+    """say line"""
     await __schedule_delete_message(ctx)
     if await __filter_banned_user(ctx):
         return
@@ -90,7 +90,7 @@ async def say_line(ctx: Context, line: str):
 
 @command_with_args(tts_bot, "!lang")
 async def set_lang(ctx: Context, lang: str):
-    """!lang <lang>: set language"""
+    """set language"""
     await __schedule_delete_message(ctx)
     if await __filter_banned_user(ctx):
         return
@@ -106,27 +106,26 @@ async def set_lang(ctx: Context, lang: str):
 
 @command(tts_bot, "!howto")
 async def howto(ctx: Context):
-    """!howto: help"""
+    """help"""
     await __schedule_delete_message(ctx)
     if await __filter_banned_user(ctx):
         return
     bot, client, config, message = ctx
-    help_message = "HELP:\n"
-    for f in bot.command_dict.values():
-        help_message += f"\t{f.__doc__}\n"
-    for f in bot.command_with_args_dict.values():
-        help_message += f"\t{f.__doc__}\n"
-    help_message += f"CONFIG:\n"
-    for k, v in config.offline.__dict__().items():
-        help_message += f"\t{k}: {v}\n"
-    help_message += "LINE AVAILABLE:\n"
-    for line in config.lines():
-        help_message += f"\t{line}"
-    help_message += "\n"
-    help_message += "LANG AVAILABLE:\n"
-    for lang in gtts.lang.tts_langs():
-        help_message += f"\t{lang}"
-    help_message += "\n"
+    bot_help = bot.__repr__()
+    config_help = "\n".join([f"{k} : {v}" for k, v in config.offline.items()])
+    line_available = " ".join(config.lines())
+    lang_available = " ".join(gtts.lang.tts_langs())
+
+    help_message = f"""
+    HELP
+    {bot_help}
+    CONFIG
+    {config_help}
+    LINE AVAILABLE
+    {line_available}
+    LANG AVAILABLE
+    {lang_available}
+    """
 
     await __resp_info(ctx, help_message)
 
