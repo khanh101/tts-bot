@@ -37,4 +37,3 @@ class JsonObject:
         self.__ensure()
         with open(self.__config_path, "r") as f:
             return json.load(f)
-

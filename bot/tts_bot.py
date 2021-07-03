@@ -1,8 +1,7 @@
 import asyncio
-import json
 import os
 import time
-from typing import Optional, Any, Dict, List
+from typing import Optional, List
 
 import discord
 import gtts

@@ -10,6 +10,7 @@ class Config:
 
 class Bot:
     """Bot : Bot configurations"""
+
     def __init__(self):
         self.command_dict = {}
         self.command_with_args_dict = {}
