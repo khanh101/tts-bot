@@ -11,6 +11,7 @@ def init():
     import bot.tts_bot  # necessary for function
     print(bot.tts_bot)
 
+
 if __name__ == "__main__":
     init()
 
