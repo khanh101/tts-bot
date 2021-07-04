@@ -8,7 +8,7 @@ from tok import TOKEN
 
 
 def init():
-    import bot.tts_bot  # neccessary for function
+    import bot.tts_bot  # necessary for function
     print(f"{bot.tts_bot.tts_bot}")
 
 
