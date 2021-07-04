@@ -9,8 +9,7 @@ from tok import TOKEN
 
 def init():
     import bot.tts_bot  # necessary for function
-    print(f"{bot.tts_bot.tts_bot}")
-
+    print(bot.tts_bot)
 
 if __name__ == "__main__":
     init()

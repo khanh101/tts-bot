@@ -54,6 +54,7 @@ def command(bot: Bot, key: str):
     """command"""
 
     def __new_command(f: Command) -> Command:
+        print(f"added {key} : {f.__doc__}")
         bot.command_dict[key] = f
         return f
 
@@ -64,6 +65,7 @@ def command_with_args(bot: Bot, key: str):
     """command with args"""
 
     def __new_command(f: CommandwithArgs) -> CommandwithArgs:
+        print(f"added {key} : {f.__doc__}")
         bot.command_with_args_dict[key] = f
         return f
 
@@ -71,10 +73,10 @@ def command_with_args(bot: Bot, key: str):
 
 
 def default(bot: Bot):
+    """default command"""
+
     def __new_command(f: Command) -> Command:
-        """default command"""
-        if bot.default is not None:
-            raise Exception("default command must be set at most once")
+        print(f"added default : {f.__doc__}")
         bot.default = f
         return f
 
