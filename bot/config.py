@@ -9,15 +9,16 @@ class TtsConfig:
         self.guild_id: str = guild_id
         self.config_path: str = os.path.join("cfg", f"cfg_{guild_id}.json")
         self.last_voice_access: int = int(time.time())
-        self.default_object: Dict[str, Any] = {
-            "tts_channel": "tts-bot",
-            "lang": "vi",
-            "voice_timeout": 1000,
-            "resp_timeout": 15,
-            "ban_list": [],
-            "tts_path": f"tts_{guild_id}.mp3",
-            "line_dir": "line",
-        }
+        if not os.path.exists(self.config_path):
+            self.__write_object({
+                "tts_channel": "tts-bot",
+                "lang": "vi",
+                "voice_timeout": 1000,
+                "resp_timeout": 15,
+                "ban_list": [],
+                "tts_path": f"tts_{guild_id}.mp3",
+                "line_dir": "line",
+            })
 
     def __write_object(self, config: Dict[str, Any]):
         with open(self.config_path, "w") as fp:
@@ -33,7 +34,7 @@ class TtsConfig:
     tts_channel = property(__get_tts_channel)
 
     def __get_lang(self) -> str:
-        return self.__read_object()["tts_channel"]
+        return self.__read_object()["lang"]
 
     def __set_lang(self, lang: str):
         config = self.__read_object()
@@ -50,7 +51,7 @@ class TtsConfig:
     def __get_resp_timeout(self) -> str:
         return self.__read_object()["resp_timeout"]
 
-    resp_timeout = property(__get_voice_timeout)
+    resp_timeout = property(__get_resp_timeout)
 
     def __get_ban_list(self) -> List[str]:
         return self.__read_object()["ban_list"]
@@ -71,4 +72,3 @@ class TtsConfig:
         return [".".join(filename.split('.')[:-1]) for filename in os.listdir(self.line_dir)]
 
     lines = property(__get_lines)
-

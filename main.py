@@ -41,7 +41,7 @@ if __name__ == "__main__":
                 if DEBUG and msg.channel.name != "test":
                     return
 
-                guild_id = str(msg.guild)
+                guild_id = str(msg.guild.id)
                 if guild_id not in online:
                     online[guild_id] = init_cfg(guild_id)
 

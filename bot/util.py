@@ -23,6 +23,7 @@ async def __play_audio_file(ctx: Context, path: str):
         await author_voice_state.channel.connect()
 
     # play audio file
+    bot_voice_client: discord.VoiceClient = discord.utils.get(ctx.cli.voice_clients, guild=ctx.msg.guild)
     bot_voice_client.stop()
     bot_voice_client.play(discord.FFmpegPCMAudio(source=path))
 

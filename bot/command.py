@@ -19,6 +19,7 @@ async def say_text_default(ctx: Context):
 
 async def say_text(ctx: Context, text: str):
     """say text"""
+    await __schedule_delete_message(ctx, ctx.msg)
     if await __filter_banned_user(ctx):
         return
 
@@ -29,11 +30,12 @@ async def say_text(ctx: Context, text: str):
 
 
 async def say_line(ctx: Context, text: str):
+    """say line"""
     await __schedule_delete_message(ctx, ctx.msg)
     if await __filter_banned_user(ctx):
         return
 
-    line_list = ctx.cfg.lines()
+    line_list = ctx.cfg.lines
     score_list = [jaro_winkler(line, text) for line in line_list]
     line = line_list[score_list.index(max(score_list))]
 
@@ -44,30 +46,32 @@ async def say_line(ctx: Context, text: str):
 
 
 async def set_lang(ctx: Context, lang: str):
+    """set language"""
     await __schedule_delete_message(ctx, ctx.msg)
     if await __filter_banned_user(ctx):
         return
 
     if lang not in gtts.lang.tts_langs():
-        await __resp_error(f"language not available: {lang}")
+        await __resp_error(ctx, f"language not available: {lang}")
         return
 
     ctx.cfg.lang = lang
     await __resp_warning(ctx, f"language was set to {lang}")
 
 async def show_help(ctx: Context):
+    """help"""
     await __schedule_delete_message(ctx, ctx.msg)
     if await __filter_banned_user(ctx):
         return
 
     bot_help = ""
-    bot_help += "**COMMAND**\n"
+    bot_help += "COMMAND\n"
     for key, cmd in ctx.bot.command_dict.items():
         bot_help += f"\t{key} : {cmd.__doc__}\n"
-    bot_help += "**COMMAND WITH ARGS**\n"
+    bot_help += "COMMAND WITH ARGS\n"
     for key, cmd in ctx.bot.command_with_args_dict.items():
-        bot_help += f"\t{key} : {cmd.__doc__}\n"
-    bot_help += "**DEFAULT**\n"
+        bot_help += f"\t{key} <args> : {cmd.__doc__}\n"
+    bot_help += "DEFAULT\n"
     if ctx.bot.default is not None:
         bot_help += f"\t{ctx.bot.default.__doc__}\n"
     else:
@@ -85,13 +89,13 @@ async def show_help(ctx: Context):
     lang_help = f"{' '.join(gtts.lang.tts_langs())}"
 
     text = f"""
-    **HELP**
+    HELP
     {bot_help}
-    **CONFIG**
+    CONFIG
     {cfg_help}
-    **LINE AVAILABLE**
+    LINE AVAILABLE
     {line_help}
-    **LANG AVAILABLE**
+    LANG AVAILABLE
     {lang_help}
     """
 
