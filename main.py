@@ -1,15 +1,25 @@
 import os
+import sys
 
 import discord
 
 from bot.template import Context, handle
 from bot.tts_bot import TTSConfig, tts_bot
-from tok import TOKEN
+
+DEBUG = True
+
+TOKEN = ""
 
 
 def init():
     import bot.tts_bot  # necessary for function
     print(bot.tts_bot)
+
+    if len(sys.argv) <= 1:
+        sys.exit("start bot: python main.py <TOKEN>")
+
+    global TOKEN
+    TOKEN = sys.argv[1]
 
 
 if __name__ == "__main__":
@@ -30,6 +40,8 @@ if __name__ == "__main__":
 
             @client.event
             async def on_message(message: discord.Message):
+                if DEBUG and message.channel.name != "test":
+                    return
                 author: discord.Member = message.author
                 # filter out self message
                 if author == client.user:
