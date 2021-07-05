@@ -3,8 +3,8 @@ import sys
 
 import discord
 
-from bot.template import Context, handle
-from bot.tts_bot import TTSConfig, tts_bot
+from bot import init_cfg, init_bot
+from template import handle, Context
 
 DEBUG = True
 
@@ -12,11 +12,8 @@ TOKEN = ""
 
 
 def init():
-    import bot.tts_bot  # necessary for function
-    print(bot.tts_bot)
-
     if len(sys.argv) <= 1:
-        sys.exit("start bot: python main.py <TOKEN>")
+        sys.exit("start template: python main.py <TOKEN>")
 
     global TOKEN
     TOKEN = sys.argv[1]
@@ -33,34 +30,23 @@ if __name__ == "__main__":
 
     while True:
         try:
-            client = discord.Client()
+            cli = discord.Client()
 
+            tts_bot = init_bot()
             online = {}
 
 
-            @client.event
-            async def on_message(message: discord.Message):
-                if DEBUG and message.channel.name != "test":
-                    return
-                author: discord.Member = message.author
-                # filter out self message
-                if author == client.user:
-                    return
-                # filter out bot message
-                if author.bot:
-                    return
-                if isinstance(message.channel, discord.DMChannel):
-                    await message.channel.send(
-                        f"Hi {author.display_name}#{author.discriminator}, please add me to any server in order to use!",
-                    )
+            @cli.event
+            async def on_message(msg: discord.Message):
+                if DEBUG and msg.channel.name != "test":
                     return
 
-                server_id = str(message.guild.id)
-                if server_id not in online:
-                    online[server_id] = TTSConfig(server_id, os.path.join("cfg", f"cfg_{server_id}.json"), "line")
-                await handle(Context(tts_bot, client, online[server_id], message))
+                guild_id = str(msg.guild)
+                if guild_id not in online:
+                    online[guild_id] = init_cfg(guild_id)
 
+                await handle(Context(tts_bot, cli, online[guild_id], msg))
 
-            client.run(TOKEN)
+            cli.run(TOKEN)
         except Exception as e:
             print(f"ERROR: {e}")
