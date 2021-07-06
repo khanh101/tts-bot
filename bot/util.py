@@ -14,6 +14,7 @@ async def __play_audio_file(ctx: Context, path: str):
     author_voice_state: Optional[discord.VoiceState] = ctx.msg.author.voice
     if author_voice_state is None:
         await __resp_error(ctx, f"{ctx.msg.author.name}#{ctx.msg.author.discriminator} is not in any voice channel")
+        return
     # ensure author and bot in the same voice channel
     bot_voice_client: discord.VoiceClient = discord.utils.get(ctx.cli.voice_clients, guild=ctx.msg.guild)
     if bot_voice_client is None:
