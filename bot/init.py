@@ -6,10 +6,10 @@ from template import Bot
 def init_bot() -> Bot:
     bot = Bot()
     bot.set_default(say_text_default)
-    bot.set_command("tts help", show_help)
-    bot.set_command_with_args("tts lang", set_lang)
-    bot.set_command_with_args("tts say", say_text)
-    bot.set_command_with_args("tts line", say_line)
+    bot.set_command("!howto", show_help)
+    bot.set_command_with_args("!lang", set_lang)
+    bot.set_command_with_args("!say", say_text)
+    bot.set_command_with_args("!line", say_line)
     return bot
 
 
