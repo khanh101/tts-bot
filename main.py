@@ -18,11 +18,6 @@ def init():
     global TOKEN
     TOKEN = sys.argv[1]
 
-
-if __name__ == "__main__":
-    init()
-
-    # create config and line dir
     if not os.path.exists("cfg"):
         os.mkdir("cfg")
     if not os.path.exists("line"):
@@ -30,6 +25,8 @@ if __name__ == "__main__":
     if not os.path.exists("emoji"):
         os.mkdir("emoji")
 
+
+def main():
     while True:
         try:
             cli = discord.Client()
@@ -37,14 +34,11 @@ if __name__ == "__main__":
             tts_bot = init_bot()
             online = {}
 
-
             @cli.event
             async def on_message(msg: discord.Message):
                 if DEBUG and msg.channel.name != "test":
-                    # in debug mode, only serve messages from test
                     return
                 if not DEBUG and msg.channel.name == "test":
-                    # not in debug mode, skip messages from test
                     return
 
                 guild_id = str(msg.guild.id)
@@ -53,7 +47,11 @@ if __name__ == "__main__":
 
                 await handle(Context(tts_bot, cli, online[guild_id], msg))
 
-
             cli.run(TOKEN)
         except Exception as e:
             print(f"ERROR: {e}")
+
+
+if __name__ == "__main__":
+    init()
+    main()
