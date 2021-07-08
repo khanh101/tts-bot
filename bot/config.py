@@ -18,6 +18,7 @@ class TtsConfig:
                 "ban_list": [],
                 "tts_path": f"tts_{guild_id}.mp3",
                 "line_dir": "line",
+                "emoji_dir": "emoji"
             })
 
     def __write_object(self, config: Dict[str, Any]):
