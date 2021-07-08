@@ -102,6 +102,8 @@ async def show_help(ctx: Context):
 
     line_help = f"{' '.join(ctx.cfg.lines)}"
 
+    emoji_help = f"{' '.join(ctx.cfg.emojis)}"
+
     lang_help = f"{' '.join(gtts.lang.tts_langs())}"
 
     text = f"""
@@ -111,6 +113,8 @@ async def show_help(ctx: Context):
     {cfg_help}
     LINE AVAILABLE
     {line_help}
+    EMOJI AVAILABLE
+    {emoji_help}
     LANG AVAILABLE
     {lang_help}
     """
