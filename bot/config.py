@@ -68,7 +68,17 @@ class TtsConfig:
 
     line_dir = property(__get_line_dir)
 
+    def __get_emoji_dir(self) -> str:
+        return self.__read_object()["emoji_dir"]
+
+    emoji_dir = property(__get_emoji_dir)
+
     def __get_lines(self) -> List[str]:
         return [".".join(filename.split('.')[:-1]) for filename in os.listdir(self.line_dir)]
 
     lines = property(__get_lines)
+
+    def __get_emojis(self) -> List[str]:
+        return [".".join(filename.split('.')[:-1]) for filename in os.listdir(self.emoji_dir)]
+
+    emojis = property(__get_emojis)

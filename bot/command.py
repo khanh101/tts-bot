@@ -1,5 +1,6 @@
 import os.path
 
+import discord
 import gtts.lang
 from Levenshtein import jaro_winkler
 
@@ -43,6 +44,20 @@ async def say_line(ctx: Context, text: str):
 
     await __resp_info(ctx, f"lining {line}")
     await __play_audio_file(ctx, line_path)
+
+
+async def show_emoji(ctx: Context, text: str):
+    """send emoji"""
+    await __schedule_delete_message(ctx, ctx.msg)
+    if await __filter_banned_user(ctx):
+        return
+
+    emoji_list = ctx.cfg.emojis
+    score_list = [jaro_winkler(emoji, text) for emoji in emoji_list]
+    emoji = emoji_list[score_list.index(max(score_list))]
+
+    emoji_path = os.path.join(ctx.cfg.emoji_dir, emoji) + ".gif"
+    await ctx.msg.channel.send(file=discord.File(emoji_path))
 
 
 async def set_lang(ctx: Context, lang: str):
