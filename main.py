@@ -37,19 +37,20 @@ if __name__ == "__main__":
 
 
             @cli.event
-            async def on_message(req: discord.Message):
-                if DEBUG and req.channel.name != "test":
+            async def on_message(msg: discord.Message):
+                if DEBUG and msg.channel.name != "test":
                     # in debug mode, only serve messages from test
                     return
-                if not DEBUG and req.channel.name == "test":
+                if not DEBUG and msg.channel.name == "test":
                     # not in debug mode, skip messages from test
                     return
 
-                guild_id = str(req.guild.id)
+                guild_id = str(msg.guild.id)
                 if guild_id not in online:
                     online[guild_id] = init_cfg(guild_id)
 
-                await handle(Context(tts_bot, cli, online[guild_id], req))
+                await handle(Context(tts_bot, cli, online[guild_id], msg))
+
 
             cli.run(TOKEN)
         except Exception as e:

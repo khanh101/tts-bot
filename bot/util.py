@@ -11,12 +11,12 @@ from template import Context
 
 async def __play_audio_file(ctx: Context, path: str):
     # ensure author in a voice channel
-    author_voice_state: Optional[discord.VoiceState] = ctx.req.author.voice
+    author_voice_state: Optional[discord.VoiceState] = ctx.msg.author.voice
     if author_voice_state is None:
-        await __resp_error(ctx, f"{ctx.req.author.name}#{ctx.req.author.discriminator} is not in any voice channel")
+        await __resp_error(ctx, f"{ctx.msg.author.name}#{ctx.msg.author.discriminator} is not in any voice channel")
         return
     # ensure author and bot in the same voice channel
-    bot_voice_client: discord.VoiceClient = discord.utils.get(ctx.cli.voice_clients, guild=ctx.req.guild)
+    bot_voice_client: discord.VoiceClient = discord.utils.get(ctx.cli.voice_clients, guild=ctx.msg.guild)
     if bot_voice_client is None:
         await author_voice_state.channel.connect()
     elif bot_voice_client.channel != author_voice_state.channel:
@@ -24,7 +24,7 @@ async def __play_audio_file(ctx: Context, path: str):
         await author_voice_state.channel.connect()
 
     # play audio file
-    bot_voice_client: discord.VoiceClient = discord.utils.get(ctx.cli.voice_clients, guild=ctx.req.guild)
+    bot_voice_client: discord.VoiceClient = discord.utils.get(ctx.cli.voice_clients, guild=ctx.msg.guild)
     bot_voice_client.stop()
     bot_voice_client.play(discord.FFmpegPCMAudio(source=path))
 
@@ -39,7 +39,7 @@ async def __tts(ctx: Context, text: str):
 
 async def __parse_mention(ctx: Context, text: str) -> str:
     text = text.replace("!", "")
-    for user in ctx.req.mentions:
+    for user in ctx.msg.mentions:
         if user.nick is not None:
             nick = user.nick
         else:
@@ -51,14 +51,14 @@ async def __parse_mention(ctx: Context, text: str) -> str:
 
 
 async def __filter_banned_user(ctx: Context) -> bool:
-    if ctx.req.author.discriminator not in ctx.cfg.ban_list:
+    if ctx.msg.author.discriminator not in ctx.cfg.ban_list:
         return False
-    await __resp_warning(ctx, f"{ctx.req.author.name}#{ctx.req.author.discriminator} has been banned")
+    await __resp_warning(ctx, f"{ctx.msg.author.name}#{ctx.msg.author.discriminator} has been banned")
     return True
 
 
 async def __resp_info(ctx: Context, text: str):
-    await __schedule_delete_message(ctx, await ctx.req.channel.send(embed=discord.Embed(
+    await __schedule_delete_message(ctx, await ctx.msg.channel.send(embed=discord.Embed(
         title="**INFO**",
         colour=0x00FF00,
         description=text,
@@ -66,7 +66,7 @@ async def __resp_info(ctx: Context, text: str):
 
 
 async def __resp_warning(ctx: Context, text: str):
-    await __schedule_delete_message(ctx, await ctx.req.channel.send(embed=discord.Embed(
+    await __schedule_delete_message(ctx, await ctx.msg.channel.send(embed=discord.Embed(
         title="**WARNING**",
         colour=0xFFFF00,
         description=text,
@@ -74,7 +74,7 @@ async def __resp_warning(ctx: Context, text: str):
 
 
 async def __resp_error(ctx: Context, text: str):
-    await __schedule_delete_message(ctx, await ctx.req.channel.send(embed=discord.Embed(
+    await __schedule_delete_message(ctx, await ctx.msg.channel.send(embed=discord.Embed(
         title="**ERROR**",
         colour=0xFF0000,
         description=text,

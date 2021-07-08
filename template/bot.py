@@ -1,6 +1,4 @@
-from typing import Optional, Callable, Any, Coroutine, Iterable, Dict
-
-import discord
+from typing import Optional, Callable, Any, Coroutine, Dict
 
 from template.context import Context
 
