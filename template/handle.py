@@ -19,7 +19,7 @@ async def handle(ctx: Context):
 
     # command with args : match "<key><space><something else>"
     for key in ctx.bot.command_with_args_dict:
-        if len(ctx.req.content) >= len(key + " ") and ctx.req.content[:len(key + " ")] == key + " ":
+        if ctx.req.content.startswith(key + " "):
             args = ctx.req.content[len(key + " "):]
             await ctx.bot.command_with_args_dict[key](ctx, args)
             return
@@ -27,3 +27,4 @@ async def handle(ctx: Context):
     # default :
     if ctx.bot.default is not None:
         await ctx.bot.default(ctx)
+        return
