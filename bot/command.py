@@ -10,16 +10,16 @@ from template import Context
 
 async def say_text_default(ctx: Context):
     """say text in tts_channel"""
-    if ctx.msg.channel.name == ctx.cfg.tts_channel:
+    if ctx.req.channel.name == ctx.cfg.tts_channel:
         if await __filter_banned_user(ctx):
             return
-        await say_text(ctx, ctx.msg.content)
+        await say_text(ctx, ctx.req.content)
         return
 
 
 async def say_text(ctx: Context, text: str):
     """say text"""
-    await __schedule_delete_message(ctx, ctx.msg)
+    await __schedule_delete_message(ctx, ctx.req)
     if await __filter_banned_user(ctx):
         return
 
@@ -31,7 +31,7 @@ async def say_text(ctx: Context, text: str):
 
 async def say_line(ctx: Context, text: str):
     """say line"""
-    await __schedule_delete_message(ctx, ctx.msg)
+    await __schedule_delete_message(ctx, ctx.req)
     if await __filter_banned_user(ctx):
         return
 
@@ -47,7 +47,7 @@ async def say_line(ctx: Context, text: str):
 
 async def set_lang(ctx: Context, lang: str):
     """set language"""
-    await __schedule_delete_message(ctx, ctx.msg)
+    await __schedule_delete_message(ctx, ctx.req)
     if await __filter_banned_user(ctx):
         return
 
@@ -60,7 +60,7 @@ async def set_lang(ctx: Context, lang: str):
 
 async def show_help(ctx: Context):
     """help"""
-    await __schedule_delete_message(ctx, ctx.msg)
+    await __schedule_delete_message(ctx, ctx.req)
     if await __filter_banned_user(ctx):
         return
 
