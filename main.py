@@ -38,11 +38,11 @@ if __name__ == "__main__":
             online = {}
 
 
-            @cli.event
-            async def on_message(msg: discord.Message):
+            async def handle(msg: discord.Message):
                 if DEBUG and msg.channel.name != "test":
                     # in debug mode, only serve messages from test
                     return
+
                 if not DEBUG and msg.channel.name == "test":
                     # not in debug mode, skip messages from test
                     return
@@ -52,6 +52,16 @@ if __name__ == "__main__":
                     online[guild_id] = init_cfg(guild_id)
 
                 await handle(Context(tts_bot, cli, online[guild_id], msg))
+
+
+            @cli.event
+            async def on_message(msg: discord.Message):
+                await handle(msg)
+
+
+            @cli.event
+            async def on_message_edit(before: discord.Message, after: discord.Message):
+                await handle(after)
 
 
             cli.run(TOKEN)
