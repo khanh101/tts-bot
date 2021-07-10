@@ -27,6 +27,8 @@ if __name__ == "__main__":
         os.mkdir("cfg")
     if not os.path.exists("line"):
         os.mkdir("line")
+    if not os.path.exists("emoji"):
+        os.mkdir("emoji")
 
     while True:
         try:
