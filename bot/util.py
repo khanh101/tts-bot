@@ -62,7 +62,7 @@ async def __resp_info(ctx: Context, text: str):
         title="**INFO**",
         colour=0x00FF00,
         description=text,
-    ).set_footer(text="ERROR: intended use, need not to read")))
+    ).set_footer(text="INFO: intended use, need not to read")))
 
 
 async def __resp_warning(ctx: Context, text: str):
@@ -70,7 +70,7 @@ async def __resp_warning(ctx: Context, text: str):
         title="**WARNING**",
         colour=0xFFFF00,
         description=text,
-    ).set_footer(text="ERROR: intended use, need to read")))
+    ).set_footer(text="WARNING: intended use, need to read")))
 
 
 async def __resp_error(ctx: Context, text: str):
