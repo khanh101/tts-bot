@@ -14,7 +14,11 @@ async def say_text_default(ctx: Context):
     if ctx.msg.channel.name == ctx.cfg.tts_channel:
         if await __filter_banned_user(ctx):
             return
-        await say_text(ctx, ctx.msg.content)
+
+        text = await __parse_mention(ctx, ctx.msg.content)
+
+        await __tts(ctx, text)
+        await __play_audio_file(ctx, ctx.cfg.tts_path)
         return
 
 
