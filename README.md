@@ -2,6 +2,10 @@
 
 discord text to speech bot
 
+# notes (2023/04/23)
+
+looks like discord changed their bot privileges, so `discord.py==1.7.3` is no longer working.
+
 ## useful links
 
 - youtube to mp3: https://yt1s.com/youtube-to-mp3/en10
